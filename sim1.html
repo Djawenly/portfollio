@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Toucan Simulator | Portfolio Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Fredoka for a playful game/food/sport vibe & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <!-- Tone.js for procedural sound effects (no external audio URLs needed) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandRed: '#e01f27',
+                        brandDark: '#0a0102',
+                        brandYellow: '#f4bc22',
+                        brandPink: '#ff00d3',
+                    },
+                    fontFamily: {
+                        game: ['Fredoka', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Animations & Game Polish */
+        body {
+            background-color: #0a0102;
+            color: #ffffff;
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Background Grid Pattern for Arcade/Sports Feel */
+        .arcade-bg {
+            background-image: 
+                radial-gradient(circle at 50% 40%, rgba(224, 31, 39, 0.15) 0%, rgba(10, 1, 2, 0.95) 70%),
+                linear-gradient(to right, rgba(255, 0, 211, 0.07) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(244, 188, 34, 0.07) 1px, transparent 1px);
+            background-size: 100% 100%, 40px 40px, 40px 40px;
+        }
+
+        /* Bird Idle Breathing Animation */
+        @keyframes idleBob {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(-1deg); }
+        }
+
+        /* Bird Walking Bounce Animation */
+        @keyframes walkBounce {
+            0%, 100% { transform: translateY(0px) rotate(-2deg); }
+            25% { transform: translateY(-16px) rotate(3deg); }
+            50% { transform: translateY(0px) rotate(-2deg); }
+            75% { transform: translateY(-16px) rotate(3deg); }
+        }
+
+        /* Leg Stride Animations */
+        @keyframes legLeftWalk {
+            0%, 100% { transform: rotate(-28deg); }
+            50% { transform: rotate(32deg); }
+        }
+
+        @keyframes legRightWalk {
+            0%, 100% { transform: rotate(32deg); }
+            50% { transform: rotate(-28deg); }
+        }
+
+        /* Ground Track Scrolling when walking */
+        @keyframes groundScroll {
+            0% { background-position: 0px 0px; }
+            100% { background-position: -120px 0px; }
+        }
+
+        /* Click Squash & Stretch Reaction */
+        @keyframes squishPop {
+            0% { transform: scale(1, 1); }
+            30% { transform: scale(1.12, 0.88); }
+            60% { transform: scale(0.94, 1.06); }
+            100% { transform: scale(1, 1); }
+        }
+
+        /* Beak Snap Animation */
+        @keyframes upperBeakSnap {
+            0%, 100% { transform: rotate(0deg); }
+            40% { transform: rotate(-16deg); }
+            75% { transform: rotate(4deg); }
+        }
+
+        @keyframes lowerBeakSnap {
+            0%, 100% { transform: rotate(0deg); }
+            40% { transform: rotate(18deg); }
+            75% { transform: rotate(-3deg); }
+        }
+
+        /* Wing Flap Animation */
+        @keyframes wingFlap {
+            0%, 100% { transform: rotate(0deg); }
+            35% { transform: rotate(-35deg) translateY(-8px); }
+            70% { transform: rotate(12deg); }
+        }
+
+        /* Applied Classes */
+        .bird-idle {
+            animation: idleBob 2.4s ease-in-out infinite;
+        }
+
+        .bird-walking {
+            animation: walkBounce 0.65s ease-in-out infinite;
+        }
+
+        .leg-left {
+            transform-origin: 215px 310px;
+        }
+        .leg-right {
+            transform-origin: 255px 310px;
+        }
+
+        .walking .leg-left {
+            animation: legLeftWalk 0.65s ease-in-out infinite;
+        }
+
+        .walking .leg-right {
+            animation: legRightWalk 0.65s ease-in-out infinite;
+        }
+
+        .ground-track {
+            background: repeating-linear-gradient(
+                90deg,
+                #e01f27 0px,
+                #e01f27 30px,
+                #f4bc22 30px,
+                #f4bc22 60px,
+                #ff00d3 60px,
+                #ff00d3 90px,
+                #0a0102 90px,
+                #0a0102 120px
+            );
+        }
+
+        .ground-moving {
+            animation: groundScroll 0.65s linear infinite;
+        }
+
+        .animate-squish {
+            animation: squishPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .upper-beak {
+            transform-origin: 310px 165px;
+        }
+        .lower-beak {
+            transform-origin: 310px 192px;
+        }
+
+        .beak-snapping .upper-beak {
+            animation: upperBeakSnap 0.4s ease-out;
+        }
+        .beak-snapping .lower-beak {
+            animation: lowerBeakSnap 0.4s ease-out;
+        }
+
+        .wing-group {
+            transform-origin: 215px 225px;
+        }
+        .wing-flapping {
+            animation: wingFlap 0.45s ease-out;
+        }
+
+        /* Interactive SVG Hover & Cursor */
+        .interactive-part {
+            cursor: pointer;
+            transition: filter 0.2s ease;
+        }
+        .interactive-part:hover {
+            filter: drop-shadow(0 0 12px rgba(244, 188, 34, 0.7));
+        }
+
+        /* Floating Score / Reaction Text */
+        @keyframes floatUpFade {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            50% { opacity: 1; transform: translateY(-35px) scale(1.15); }
+            100% { opacity: 0; transform: translateY(-65px) scale(1); }
+        }
+        .floating-badge {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUpFade 0.85s ease-out forwards;
+            z-index: 50;
+        }
+
+        /* Arcade Button 3D Press Effect */
+        .btn-arcade {
+            box-shadow: 0 6px 0 #991117, 0 10px 20px rgba(224, 31, 39, 0.4);
+            transition: all 0.1s ease;
+        }
+        .btn-arcade:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #991117, 0 4px 10px rgba(224, 31, 39, 0.4);
+        }
+
+        .btn-arcade-active {
+            background: linear-gradient(135deg, #ff00d3, #e01f27) !important;
+            box-shadow: 0 6px 0 #8a0072, 0 10px 25px rgba(255, 0, 211, 0.5);
+        }
+    </style>
+</head>
+<body class="arcade-bg min-h-screen flex flex-col justify-between font-sans selection:bg-brandPink selection:text-white">
+
+    <!-- Top Header / HUD Bar -->
+    <header class="w-full max-w-5xl mx-auto px-4 pt-4 pb-2 flex flex-wrap items-center justify-between gap-3 z-20">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brandRed via-brandPink to-brandYellow flex items-center justify-center shadow-lg shadow-brandPink/30">
+                <span class="font-game font-bold text-xl text-brandDark">B!</span>
+            </div>
+            <div>
+                <h1 class="font-game text-xl sm:text-2xl font-bold tracking-wide text-white flex items-center gap-2">
+                    MEGA-BEAK <span class="text-brandYellow">SIM</span>
+                </h1>
+                <p class="text-xs text-gray-400">Interactive Character Studio</p>
+            </div>
+        </div>
+
+        <!-- Arcade Stats / Interactive Counters -->
+        <div class="flex items-center gap-2 sm:gap-4 bg-white/5 border border-white/10 backdrop-blur-md px-4 py-2 rounded-2xl">
+            <div class="text-center px-2">
+                <span class="block text-[10px] uppercase tracking-wider text-brandYellow font-bold">Body Taps</span>
+                <span id="body-count" class="font-game text-lg sm:text-xl font-bold text-white">0</span>
+            </div>
+            <div class="h-6 w-[1px] bg-white/15"></div>
+            <div class="text-center px-2">
+                <span class="block text-[10px] uppercase tracking-wider text-brandPink font-bold">Beak Snaps</span>
+                <span id="beak-count" class="font-game text-lg sm:text-xl font-bold text-white">0</span>
+            </div>
+            <div class="h-6 w-[1px] bg-white/15"></div>
+            <button id="sound-toggle" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-brandYellow transition" title="Toggle Arcade Sound">
+                <svg id="sound-on-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"></path></svg>
+                <svg id="sound-off-icon" class="w-5 h-5 hidden text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zM17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"></path></svg>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Interactive Stage -->
+    <main class="relative flex-1 flex flex-col items-center justify-center w-full max-w-4xl mx-auto px-4 py-2">
+        
+        <!-- Live Action Status Pill -->
+        <div id="status-banner" class="mb-2 px-4 py-1.5 rounded-full bg-brandDark/80 border border-brandYellow/40 text-brandYellow font-game text-sm tracking-wide shadow-lg flex items-center gap-2 transition-all">
+            <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-brandYellow animate-pulse"></span>
+            <span id="status-text">Tap the Bird's Body or Long Beak!</span>
+        </div>
+
+        <!-- Stage Container where floating emojis/popups spawn -->
+        <div id="stage-area" class="relative w-full max-w-[600px] aspect-[5/4] sm:aspect-[4/3] flex items-center justify-center">
+            
+            <!-- Glowing Spotlight Behind Bird -->
+            <div class="absolute w-64 h-64 sm:w-80 sm:h-80 rounded-full bg-gradient-to-tr from-brandRed/25 via-brandPink/20 to-brandYellow/25 blur-2xl pointer-events-none"></div>
+
+            <!-- Interactive SVG Bird -->
+            <svg id="bird-svg" viewBox="0 0 600 420" class="w-full h-full max-h-[420px] overflow-visible drop-shadow-[0_20px_25px_rgba(0,0,0,0.8)]">
+                <defs>
+                    <!-- Custom Gradients using user's exact palette -->
+                    <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#e01f27" />
+                        <stop offset="60%" stop-color="#b8141b" />
+                        <stop offset="100%" stop-color="#0a0102" />
+                    </linearGradient>
+
+                    <linearGradient id="chestGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%" stop-color="#f4bc22" />
+                        <stop offset="100%" stop-color="#ff00d3" />
+                    </linearGradient>
+
+                    <linearGradient id="beakTopGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#f4bc22" />
+                        <stop offset="55%" stop-color="#ff6b00" />
+                        <stop offset="85%" stop-color="#e01f27" />
+                        <stop offset="100%" stop-color="#ff00d3" />
+                    </linearGradient>
+
+                    <linearGradient id="beakBottomGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#d49b00" />
+                        <stop offset="70%" stop-color="#e01f27" />
+                        <stop offset="100%" stop-color="#0a0102" />
+                    </linearGradient>
+
+                    <linearGradient id="wingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#ff00d3" />
+                        <stop offset="50%" stop-color="#e01f27" />
+                        <stop offset="100%" stop-color="#0a0102" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Ground Shadow -->
+                <ellipse id="bird-shadow" cx="245" cy="382" rx="85" ry="14" fill="rgba(0,0,0,0.65)" />
+
+                <!-- Whole Bird Wrapper for Walk/Idle Motion -->
+                <g id="bird-rig" class="bird-idle">
+                    
+                    <!-- BACK LEG (Right Leg) -->
+                    <g id="leg-right" class="leg-right">
+                        <path d="M 255 305 L 265 368" stroke="#f4bc22" stroke-width="11" stroke-linecap="round" />
+                        <!-- Sporty Sneaker / Talon -->
+                        <path d="M 248 368 L 288 368 C 294 368, 294 378, 285 378 L 245 378 Z" fill="#ff00d3" stroke="#0a0102" stroke-width="3" />
+                        <line x1="255" y1="373" x2="282" y2="373" stroke="#f4bc22" stroke-width="2.5" stroke-linecap="round" />
+                    </g>
+
+                    <!-- FRONT LEG (Left Leg) -->
+                    <g id="leg-left" class="leg-left">
+                        <path d="M 215 305 L 205 368" stroke="#f4bc22" stroke-width="11" stroke-linecap="round" />
+                        <!-- Sporty Sneaker / Talon -->
+                        <path d="M 188 368 L 228 368 C 234 368, 234 378, 225 378 L 185 378 Z" fill="#e01f27" stroke="#0a0102" stroke-width="3" />
+                        <line x1="195" y1="373" x2="222" y2="373" stroke="#f4bc22" stroke-width="2.5" stroke-linecap="round" />
+                    </g>
+
+                    <!-- Squish Wrapper for Body & Beak -->
+                    <g id="bird-squish-group" style="transform-origin: 240px 230px;">
+                        
+                        <!-- TAIL FEATHERS (Clickable part of Body) -->
+                        <g class="bird-body-trigger interactive-part">
+                            <path d="M 155 255 L 75 235 L 95 268 L 65 285 L 155 288 Z" fill="#0a0102" stroke="#ff00d3" stroke-width="3" stroke-linejoin="round" />
+                            <path d="M 150 265 L 90 262 L 105 278 L 152 280 Z" fill="#f4bc22" />
+                        </g>
+
+                        <!-- MAIN BODY & HEAD (Clickable Body Zone) -->
+                        <g id="bird-body" class="bird-body-trigger interactive-part">
+                            <!-- Torso & Head Silhouette -->
+                            <path d="M 150 250 
+                                     C 145 160, 195 115, 255 115 
+                                     C 295 115, 320 140, 322 180 
+                                     C 325 230, 305 315, 235 315 
+                                     C 175 315, 153 285, 150 250 Z" 
+                                  fill="url(#bodyGrad)" stroke="#0a0102" stroke-width="4" />
+
+                            <!-- Vibrant Chest Bib (Sport/Food Jersey Vibe) -->
+                            <path d="M 262 165 
+                                     C 305 165, 320 205, 308 255 
+                                     C 295 290, 255 295, 240 265 
+                                     C 228 235, 238 175, 262 165 Z" 
+                                  fill="url(#chestGrad)" stroke="#0a0102" stroke-width="3" />
+
+                            <!-- Sport Stripe on Chest -->
+                            <path d="M 243 220 Q 278 230 309 215" fill="none" stroke="#0a0102" stroke-width="5" />
+                            <path d="M 245 232 Q 278 242 307 227" fill="none" stroke="#ffffff" stroke-width="2.5" />
+
+                            <!-- Head Crest / Mohawk Feathers -->
+                            <path d="M 215 122 C 200 90, 225 78, 235 116 Z" fill="#ff00d3" stroke="#0a0102" stroke-width="2.5" />
+                            <path d="M 232 117 C 228 82, 255 78, 252 115 Z" fill="#f4bc22" stroke="#0a0102" stroke-width="2.5" />
+                            <path d="M 248 116 C 254 90, 275 92, 266 118 Z" fill="#e01f27" stroke="#0a0102" stroke-width="2.5" />
+
+                            <!-- Eye Patch & Expressive Eye -->
+                            <circle cx="282" cy="152" r="22" fill="#f4bc22" stroke="#0a0102" stroke-width="3" />
+                            <circle cx="285" cy="152" r="14" fill="#ffffff" />
+                            <circle id="bird-pupil" cx="289" cy="152" r="8" fill="#0a0102" />
+                            <circle cx="292" cy="148" r="3" fill="#ffffff" />
+                            <!-- Sporty Brow -->
+                            <path d="M 263 136 L 302 141" stroke="#0a0102" stroke-width="5" stroke-linecap="round" />
+                        </g>
+
+                        <!-- WING (Flaps when Body is clicked) -->
+                        <g id="bird-wing" class="wing-group bird-body-trigger interactive-part">
+                            <path d="M 195 205 
+                                     C 165 215, 155 265, 185 290 
+                                     C 215 305, 255 275, 245 235 
+                                     C 238 210, 215 198, 195 205 Z" 
+                                  fill="url(#wingGrad)" stroke="#0a0102" stroke-width="3.5" />
+                            <!-- Wing Accent Feather Lines -->
+                            <path d="M 180 245 Q 205 255 232 242" fill="none" stroke="#f4bc22" stroke-width="3" stroke-linecap="round" />
+                            <path d="M 185 265 Q 208 273 228 262" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" />
+                        </g>
+
+                        <!-- EXTRA LONG INTERACTIVE BEAK (Clickable Beak Zone!) -->
+                        <g id="bird-beak" class="interactive-part">
+                            <!-- Lower Beak Mandible -->
+                            <g class="lower-beak">
+                                <path d="M 310 190 
+                                         L 545 190 
+                                         C 535 212, 460 222, 310 212 Z" 
+                                      fill="url(#beakBottomGrad)" stroke="#0a0102" stroke-width="3.5" stroke-linejoin="round" />
+                            </g>
+
+                            <!-- Upper Beak Mandible (Super Long & Stylized) -->
+                            <g class="upper-beak">
+                                <path d="M 308 142 
+                                         C 395 135, 515 145, 565 182 
+                                         C 572 188, 565 193, 552 192 
+                                         L 308 192 Z" 
+                                      fill="url(#beakTopGrad)" stroke="#0a0102" stroke-width="3.5" stroke-linejoin="round" />
+                                
+                                <!-- Beak Glossy Highlight -->
+                                <path d="M 325 152 C 405 148, 490 156, 535 175" fill="none" stroke="rgba(255,255,255,0.65)" stroke-width="4" stroke-linecap="round" />
+                                
+                                <!-- Neon Pink Tip Accent (Like a glowing popsicle / arcade target) -->
+                                <path d="M 522 162 C 542 168, 558 176, 565 182 C 570 187, 564 192, 552 192 L 525 192 Z" fill="#ff00d3" stroke="#0a0102" stroke-width="2.5" />
+                                
+                                <!-- Nostril Detail -->
+                                <circle cx="326" cy="162" r="3.5" fill="#0a0102" />
+                            </g>
+
+                            <!-- Beak Base Ring -->
+                            <path d="M 308 140 C 316 165, 316 192, 308 214" fill="none" stroke="#0a0102" stroke-width="6" stroke-linecap="round" />
+                        </g>
+
+                    </g>
+                </g>
+            </svg>
+        </div>
+
+        <!-- Arcade Runway / Ground Track -->
+        <div class="w-full max-w-2xl mt-[-18px] z-10 px-2">
+            <div class="h-4 w-full rounded-full overflow-hidden border-2 border-white/20 bg-brandDark shadow-[0_0_20px_rgba(255,0,211,0.3)]">
+                <div id="ground-strip" class="w-[200%] h-full ground-track opacity-90"></div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Control Deck -->
+    <footer class="w-full max-w-3xl mx-auto px-4 pb-6 pt-2 z-20">
+        <div class="bg-white/5 border border-white/10 backdrop-blur-lg rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            
+            <!-- Interactive Instructions -->
+            <div class="flex flex-wrap items-center justify-center sm:justify-start gap-2 text-xs sm:text-sm">
+                <span class="px-3 py-1.5 rounded-xl bg-brandRed/20 border border-brandRed/50 text-white font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-brandRed"></span> Click Body: Flap & Chirp
+                </span>
+                <span class="px-3 py-1.5 rounded-xl bg-brandYellow/20 border border-brandYellow/50 text-brandYellow font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-brandYellow"></span> Click Beak: Mega Snap!
+                </span>
+            </div>
+
+            <!-- Primary Action Buttons -->
+            <div class="flex items-center gap-3 w-full sm:w-auto justify-center">
+                <!-- MOVE BUTTON -->
+                <button id="move-btn" class="btn-arcade flex-1 sm:flex-initial px-7 py-3.5 rounded-2xl bg-brandRed hover:bg-red-600 text-white font-game font-bold text-lg tracking-wider uppercase flex items-center justify-center gap-2.5 cursor-pointer">
+                    <svg id="walk-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"></path>
+                    </svg>
+                    <span id="move-btn-text">MOVE</span>
+                </button>
+
+                <!-- BONUS SNACK / FEED BUTTON (Fits Food/Game Look & Feel) -->
+                <button id="snack-btn" class="px-4 py-3.5 rounded-2xl bg-brandYellow hover:bg-yellow-400 text-brandDark font-game font-bold text-base tracking-wide uppercase shadow-[0_5px_0_#b38300] active:translate-y-1 transition flex items-center gap-1.5 cursor-pointer" title="Toss a Berry Snack!">
+                    <span>🍒</span>
+                    <span class="hidden md:inline">Snack</span>
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive Logic & Sound Synthesis -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // State Variables
+            let isWalking = false;
+            let soundEnabled = true;
+            let bodyClicks = 0;
+            let beakClicks = 0;
+            let audioInitialized = false;
+
+            // DOM Elements
+            const moveBtn = document.getElementById('move-btn');
+            const moveBtnText = document.getElementById('move-btn-text');
+            const snackBtn = document.getElementById('snack-btn');
+            const birdRig = document.getElementById('bird-rig');
+            const birdSquishGroup = document.getElementById('bird-squish-group');
+            const birdWing = document.getElementById('bird-wing');
+            const birdBeak = document.getElementById('bird-beak');
+            const groundStrip = document.getElementById('ground-strip');
+            const stageArea = document.getElementById('stage-area');
+            const bodyCountEl = document.getElementById('body-count');
+            const beakCountEl = document.getElementById('beak-count');
+            const statusText = document.getElementById('status-text');
+            const statusDot = document.getElementById('status-dot');
+            const soundToggle = document.getElementById('sound-toggle');
+            const soundOnIcon = document.getElementById('sound-on-icon');
+            const soundOffIcon = document.getElementById('sound-off-icon');
+            const birdPupil = document.getElementById('bird-pupil');
+
+            // Tone.js Synthesizers for Game Sound Effects
+            let synth, membraneSynth;
+
+            async function initAudio() {
+                if (!audioInitialized && typeof Tone !== 'undefined') {
+                    try {
+                        await Tone.start();
+                        synth = new Tone.PolySynth(Tone.Synth, {
+                            oscillator: { type: 'triangle' },
+                            envelope: { attack: 0.01, decay: 0.15, sustain: 0.05, release: 0.2 }
+                        }).toDestination();
+                        synth.volume.value = -8;
+
+                        membraneSynth = new Tone.MembraneSynth({
+                            pitchDecay: 0.03,
+                            octaves: 4,
+                            envelope: { attack: 0.005, decay: 0.15, sustain: 0 }
+                        }).toDestination();
+                        membraneSynth.volume.value = -6;
+                        audioInitialized = true;
+                    } catch (e) {
+                        console.warn('Audio init deferred:', e);
+                    }
+                }
+            }
+
+            function playBodySound() {
+                if (!soundEnabled || !audioInitialized) return;
+                const notes = ['C5', 'E5', 'G5', 'A5'];
+                const randomNote = notes[Math.floor(Math.random() * notes.length)];
+                synth.triggerAttackRelease(randomNote, '16n');
+            }
+
+            function playBeakSound() {
+                if (!soundEnabled || !audioInitialized) return;
+                // Clack sound using high percussion + bright note
+                membraneSynth.triggerAttackRelease('G4', '32n');
+                setTimeout(() => {
+                    if (soundEnabled && audioInitialized) {
+                        synth.triggerAttackRelease('D6', '32n');
+                    }
+                }, 60);
+            }
+
+            function playStepSound() {
+                if (!soundEnabled || !audioInitialized || !isWalking) return;
+                membraneSynth.triggerAttackRelease('C2', '32n');
+            }
+
+            // Sound Toggle Handler
+            soundToggle.addEventListener('click', async () => {
+                await initAudio();
+                soundEnabled = !soundEnabled;
+                soundOnIcon.classList.toggle('hidden', !soundEnabled);
+                soundOffIcon.classList.toggle('hidden', soundEnabled);
+            });
+
+            // Helper: Spawn Floating Pop-up Text on Stage
+            function spawnPopup(x, y, text, colorHex) {
+                const rect = stageArea.getBoundingClientRect();
+                const badge = document.createElement('div');
+                badge.className = 'floating-badge font-game font-bold text-lg sm:text-xl px-3 py-1 rounded-full shadow-lg border-2';
+                badge.style.left = `${Math.min(Math.max(x - rect.left - 30, 10), rect.width - 110)}px`;
+                badge.style.top = `${Math.min(Math.max(y - rect.top - 20, 10), rect.height - 50)}px`;
+                badge.style.backgroundColor = '#0a0102';
+                badge.style.borderColor = colorHex;
+                badge.style.color = colorHex;
+                badge.textContent = text;
+                stageArea.appendChild(badge);
+
+                setTimeout(() => {
+                    badge.remove();
+                }, 850);
+            }
+
+            // Helper: Retrigger CSS Animation cleanly
+            function triggerAnimation(element, className) {
+                element.classList.remove(className);
+                void element.offsetWidth; // Force reflow
+                element.classList.add(className);
+            }
+
+            // 1. CLICK BODY INTERACTION
+            const bodyTriggers = document.querySelectorAll('.bird-body-trigger');
+            bodyTriggers.forEach(trigger => {
+                trigger.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await initAudio();
+                    playBodySound();
+
+                    bodyClicks++;
+                    bodyCountEl.textContent = bodyClicks;
+
+                    // Animate Squish & Wing Flap
+                    triggerAnimation(birdSquishGroup, 'animate-squish');
+                    triggerAnimation(birdWing, 'wing-flapping');
+
+                    // Update Status Banner
+                    const phrases = ['CHIRP! Wing Flap!', 'Turbo Feathers!', 'Ready to Sprint!', 'Boing! Nice Tap!'];
+                    statusText.textContent = phrases[bodyClicks % phrases.length];
+                    statusDot.style.backgroundColor = '#e01f27';
+
+                    // Spawn Floating Badge
+                    const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 250;
+                    const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 200;
+                    spawnPopup(clientX, clientY, 'FLAP! +1', '#e01f27');
+                });
+            });
+
+            // 2. CLICK LONG BEAK INTERACTION
+            birdBeak.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                await initAudio();
+                playBeakSound();
+
+                beakClicks++;
+                beakCountEl.textContent = beakClicks;
+
+                // Animate Upper & Lower Beak Snap + Slight Squish
+                triggerAnimation(birdBeak, 'beak-snapping');
+                triggerAnimation(birdSquishGroup, 'animate-squish');
+
+                // Update Status Banner
+                const beakPhrases = ['CLACK-CLACK! Mega Beak!', 'Chomp Power Activated!', 'Neon Beak Snap!', 'Maximum Reach!'];
+                statusText.textContent = beakPhrases[beakClicks % beakPhrases.length];
+                statusDot.style.backgroundColor = '#ff00d3';
+
+                // Spawn Floating Badge
+                const clientX = e.clientX || (e.touches && e.touches[0].clientX) || 420;
+                const clientY = e.clientY || (e.touches && e.touches[0].clientY) || 180;
+                spawnPopup(clientX, clientY, 'SNAP! +1', '#ff00d3');
+            });
+
+            // 3. MOVE BUTTON (TOGGLE WALKING ANIMATION)
+            let walkSoundInterval = null;
+
+            moveBtn.addEventListener('click', async () => {
+                await initAudio();
+                isWalking = !isWalking;
+
+                if (isWalking) {
+                    // Activate Walking Mode
+                    birdRig.classList.remove('bird-idle');
+                    birdRig.classList.add('bird-walking', 'walking');
+                    groundStrip.classList.add('ground-moving');
+                    
+                    moveBtn.classList.add('btn-arcade-active');
+                    moveBtnText.textContent = 'STOP';
+                    statusText.textContent = 'Bird is Strutting Down the Track!';
+                    statusDot.style.backgroundColor = '#ff00d3';
+
+                    // Subtle footstep rhythm
+                    playStepSound();
+                    walkSoundInterval = setInterval(playStepSound, 325);
+                } else {
+                    // Return to Idle Breathing Mode
+                    birdRig.classList.remove('bird-walking', 'walking');
+                    birdRig.classList.add('bird-idle');
+                    groundStrip.classList.remove('ground-moving');
+
+                    moveBtn.classList.remove('btn-arcade-active');
+                    moveBtnText.textContent = 'MOVE';
+                    statusText.textContent = 'Bird Paused — Tap Body or Beak!';
+                    statusDot.style.backgroundColor = '#f4bc22';
+
+                    clearInterval(walkSoundInterval);
+                }
+            });
+
+            // 4. BONUS SNACK BUTTON (Food/Game Theme)
+            snackBtn.addEventListener('click', async () => {
+                await initAudio();
+                playBeakSound();
+                triggerAnimation(birdBeak, 'beak-snapping');
+                triggerAnimation(birdWing, 'wing-flapping');
+                
+                const rect = birdBeak.getBoundingClientRect();
+                spawnPopup(rect.right - 20, rect.top, 'YUM! 🍒 +5', '#f4bc22');
+                statusText.textContent = 'CHOMP! Delicious Arcade Berry!';
+            });
+
+            // 5. SUBTLE EYE TRACKING (Follows Mouse/Touch)
+            window.addEventListener('mousemove', (e) => {
+                const svgRect = document.getElementById('bird-svg').getBoundingClientRect();
+                const eyeCenterX = svgRect.left + svgRect.width * 0.48;
+                const eyeCenterY = svgRect.top + svgRect.height * 0.36;
+
+                const angle = Math.atan2(e.clientY - eyeCenterY, e.clientX - eyeCenterX);
+                const distance = Math.min(4.5, Math.hypot(e.clientX - eyeCenterX, e.clientY - eyeCenterY) / 40);
+
+                const pupilX = 287 + Math.cos(angle) * distance;
+                const pupilY = 152 + Math.sin(angle) * distance;
+
+                birdPupil.setAttribute('cx', pupilX);
+                birdPupil.setAttribute('cy', pupilY);
+            });
+        });
+    </script>
+</body>
+</html>
