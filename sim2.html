@@ -1,1 +1,883 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Anthropocene Reviewed // Arcade Study Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Space Grotesk & Syne & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&family=Space+Grotesk:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandRed: '#e01f27',
+                        brandDark: '#0a0102',
+                        brandGold: '#f4bc22',
+                        brandPink: '#ff00d3',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0a0102;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .arcade-border {
+            border: 2px solid rgba(255, 255, 255, 0.12);
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .arcade-border:hover {
+            border-color: #f4bc22;
+            box-shadow: 0 0 25px rgba(244, 188, 34, 0.25);
+            transform: translateY(-2px);
+        }
+        .neon-glow-pink {
+            box-shadow: 0 0 20px rgba(255, 0, 211, 0.35);
+        }
+        .neon-glow-red {
+            box-shadow: 0 0 20px rgba(224, 31, 39, 0.35);
+        }
+        .neon-glow-gold {
+            box-shadow: 0 0 20px rgba(244, 188, 34, 0.35);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #e01f27, #ff00d3);
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(224, 31, 39, 0.4);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0102;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2a1215;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #e01f27;
+        }
+        @keyframes pulse-fast {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+        .typing-dot {
+            animation: pulse-fast 1s infinite;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-brandPink selection:text-white">
+
+    <!-- Top Scoreboard / Navbar -->
+    <header class="sticky top-0 z-50 bg-brandDark/90 backdrop-blur-md border-b border-white/10 px-4 py-3">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+            <!-- Brand Title -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brandRed to-brandPink flex items-center justify-center font-display font-black text-xl shadow-lg">
+                    AR
+                </div>
+                <div>
+                    <h1 class="font-display font-black text-lg sm:text-xl tracking-tight uppercase leading-none">
+                        ANTHROPOCENE <span class="text-brandGold">REVIEWED</span>
+                    </h1>
+                    <p class="text-xs text-gray-400 font-medium">NO-BORING-READING EDITION // JOHN GREEN</p>
+                </div>
+            </div>
+
+            <!-- XP / ELA Survival Meter -->
+            <div class="flex items-center gap-3 bg-white/5 px-4 py-2 rounded-2xl border border-white/10">
+                <div class="text-right">
+                    <div class="text-[10px] uppercase tracking-wider text-brandGold font-bold">ELA Survival XP</div>
+                    <div class="text-sm font-black font-display" id="xp-display">0 / 500 XP</div>
+                </div>
+                <div class="w-24 sm:w-32 h-3 bg-black rounded-full overflow-hidden border border-white/15 p-0.5">
+                    <div id="xp-bar" class="h-full bg-gradient-to-r from-brandRed via-brandPink to-brandGold rounded-full transition-all duration-500" style="width: 10%;"></div>
+                </div>
+                <span class="text-brandGold text-lg"><i class="fa-solid fa-trophy"></i></span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 sm:py-8">
+
+        <!-- Hero Banner: The TL;DR Pitch -->
+        <section class="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#1a0508] via-[#140412] to-[#0a0102] border border-white/15 p-6 sm:p-8 mb-8">
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-brandPink/20 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-12 -bottom-12 w-64 h-64 bg-brandRed/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+                <div class="max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brandRed/20 border border-brandRed/40 text-brandRed text-xs font-bold uppercase tracking-wider mb-3">
+                        <i class="fa-solid fa-bolt"></i> Anti-Boredom Intel
+                    </div>
+                    <h2 class="font-display font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight mb-3 leading-tight">
+                        WHAT IS THIS BOOK <span class="text-transparent bg-clip-text bg-gradient-to-r from-brandGold to-brandPink">ACTUALLY ABOUT?</span>
+                    </h2>
+                    <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                        Good news: <strong>There is NO traditional plot!</strong> Instead of a long, slow story, John Green reviews random parts of human life—like <strong>Dr Pepper, Mario Kart, the Indy 500, and Viral Meningitis</strong>—on a 5-star scale. Every essay mixes weird history with real personal stories about his life, sports, food, and surviving anxiety.
+                    </p>
+                </div>
+
+                <!-- Quick Stats Cards -->
+                <div class="grid grid-cols-3 gap-3 w-full lg:w-auto shrink-0">
+                    <div class="bg-black/60 border border-white/10 rounded-2xl p-4 text-center">
+                        <div class="text-2xl sm:text-3xl font-black font-display text-brandGold">44</div>
+                        <div class="text-[11px] text-gray-400 uppercase font-bold mt-1">Short Essays</div>
+                    </div>
+                    <div class="bg-black/60 border border-white/10 rounded-2xl p-4 text-center">
+                        <div class="text-2xl sm:text-3xl font-black font-display text-brandPink">5★</div>
+                        <div class="text-[11px] text-gray-400 uppercase font-bold mt-1">Rating Scale</div>
+                    </div>
+                    <div class="bg-black/60 border border-white/10 rounded-2xl p-4 text-center">
+                        <div class="text-2xl sm:text-3xl font-black font-display text-brandRed">0%</div>
+                        <div class="text-[11px] text-gray-400 uppercase font-bold mt-1">Fake Fiction</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Navigation Mode Switcher -->
+        <nav class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8" role="tablist">
+            <button onclick="switchTab('arena')" id="tab-arena" class="tab-active py-3.5 px-4 rounded-2xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <i class="fa-solid fa-gamepad"></i> <span>Essay Arena</span>
+            </button>
+            <button onclick="switchTab('themes')" id="tab-themes" class="bg-white/5 hover:bg-white/10 border border-white/10 py-3.5 px-4 rounded-2xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <i class="fa-solid fa-fire"></i> <span>Cheat Sheet</span>
+            </button>
+            <button onclick="switchTab('chat')" id="tab-chat" class="bg-white/5 hover:bg-white/10 border border-white/10 py-3.5 px-4 rounded-2xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <i class="fa-solid fa-comments"></i> <span>Live Character Chat</span>
+            </button>
+            <button onclick="switchTab('minigame')" id="tab-minigame" class="bg-white/5 hover:bg-white/10 border border-white/10 py-3.5 px-4 rounded-2xl font-display font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition-all cursor-pointer">
+                <i class="fa-solid fa-star"></i> <span>Guess The Stars</span>
+            </button>
+        </nav>
+
+        <!-- TAB 1: ESSAY ARENA (Plot & Key Essays filtered by Games, Sports, Food, Survival) -->
+        <div id="view-arena" class="space-y-6">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div>
+                    <h3 class="font-display font-black text-2xl uppercase">The Highlight Reel <span class="text-brandGold">(Best Essays)</span></h3>
+                    <p class="text-sm text-gray-400">Filter by what you actually care about: Games, Sports, Food, or Real Talk.</p>
+                </div>
+                <!-- Category Pills -->
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterEssays('all')" class="filter-btn bg-brandGold text-black font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider cursor-pointer" data-filter="all">All</button>
+                    <button onclick="filterEssays('games')" class="filter-btn bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider cursor-pointer" data-filter="games"><i class="fa-solid fa-headset mr-1 text-brandPink"></i> Games</button>
+                    <button onclick="filterEssays('sports')" class="filter-btn bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider cursor-pointer" data-filter="sports"><i class="fa-solid fa-futbol mr-1 text-brandRed"></i> Sports</button>
+                    <button onclick="filterEssays('food')" class="filter-btn bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider cursor-pointer" data-filter="food"><i class="fa-solid fa-burger mr-1 text-brandGold"></i> Food</button>
+                </div>
+            </div>
+
+            <!-- Essay Cards Grid -->
+            <div id="essay-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- TAB 2: CHEAT SHEET (Themes & Structure for ELA Essays/Tests) -->
+        <div id="view-themes" class="hidden space-y-6">
+            <div class="bg-white/5 border border-white/10 rounded-3xl p-6 sm:p-8">
+                <h3 class="font-display font-black text-2xl sm:text-3xl uppercase mb-2 text-brandGold">
+                    <i class="fa-solid fa-key mr-2"></i> ELA Teacher Cheat Sheet
+                </h3>
+                <p class="text-gray-300 text-sm sm:text-base mb-6">
+                    Drop these 4 themes in class discussions or essays and your teacher will think you read every single page twice.
+                </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <!-- Theme 1 -->
+                    <div class="bg-black/70 arcade-border rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-lg bg-brandRed/20 text-brandRed font-bold text-xs uppercase">Theme #1</span>
+                            <i class="fa-solid fa-earth-americas text-brandRed text-xl"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-xl mb-2">The Anthropocene (Humans Run the Planet)</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-3">
+                            "Anthropocene" is the current geological age where humans are the #1 force changing Earth. John shows how tiny things—like diet soda or lawn grass—have massive impacts on the planet.
+                        </p>
+                        <div class="bg-white/5 p-3 rounded-xl text-xs text-brandGold font-semibold">
+                            💬 Say this in class: "Green shows that humans aren't just living on Earth—we are actively redesigning it."
+                        </div>
+                    </div>
+
+                    <!-- Theme 2 -->
+                    <div class="bg-black/70 arcade-border rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-lg bg-brandPink/20 text-brandPink font-bold text-xs uppercase">Theme #2</span>
+                            <i class="fa-solid fa-heart-pulse text-brandPink text-xl"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-xl mb-2">Paying Attention = Caring</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-3">
+                            Reviewing things forces you to pay attention. Even when life feels overwhelming or depressing, noticing the weird beauty in everyday stuff (like a sunset or a video game) keeps you grounded.
+                        </p>
+                        <div class="bg-white/5 p-3 rounded-xl text-xs text-brandPink font-semibold">
+                            💬 Say this in class: "To Green, paying close attention to ordinary objects is a form of love and hope."
+                        </div>
+                    </div>
+
+                    <!-- Theme 3 -->
+                    <div class="bg-black/70 arcade-border rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-lg bg-brandGold/20 text-brandGold font-bold text-xs uppercase">Theme #3</span>
+                            <i class="fa-solid fa-scale-unbalanced text-brandGold text-xl"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-xl mb-2">The 5-Star Scale is Ridiculous (On Purpose)</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-3">
+                            You can't actually rate human pain or a childhood memory on a 1-to-5 star scale like an Amazon toaster. That's the point: real life is too messy and complex for simple internet ratings.
+                        </p>
+                        <div class="bg-white/5 p-3 rounded-xl text-xs text-brandGold font-semibold">
+                            💬 Say this in class: "The 5-star format mocks how internet culture tries to reduce complex emotions into scores."
+                        </div>
+                    </div>
+
+                    <!-- Theme 4 -->
+                    <div class="bg-black/70 arcade-border rounded-2xl p-6">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="px-3 py-1 rounded-lg bg-brandRed/20 text-brandRed font-bold text-xs uppercase">Theme #4</span>
+                            <i class="fa-solid fa-users text-brandRed text-xl"></i>
+                        </div>
+                        <h4 class="font-display font-bold text-xl mb-2">We Are Wired Together</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-3">
+                            Whether it's thousands of strangers cheering at a soccer match or scientists building the internet, humans survive because we connect and share experiences with each other.
+                        </p>
+                        <div class="bg-white/5 p-3 rounded-xl text-xs text-brandRed font-semibold">
+                            💬 Say this in class: "Green argues that human connection is our species' greatest survival tool."
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: LIVE CHARACTER CHAT (Powered by Gemini API) -->
+        <div id="view-chat" class="hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Character Roster Sidebar -->
+                <div class="lg:col-span-4 space-y-3">
+                    <div class="bg-white/5 border border-white/10 rounded-3xl p-5">
+                        <h3 class="font-display font-black text-xl uppercase mb-1">Select Fighter / Figure</h3>
+                        <p class="text-xs text-gray-400 mb-4">Since this is nonfiction, these are the real main figures from the book. Tap one to chat!</p>
+
+                        <div class="space-y-2.5" id="character-list">
+                            <!-- Character 1: John Green -->
+                            <button onclick="selectCharacter('john')" id="char-btn-john" class="w-full text-left p-3.5 rounded-2xl bg-gradient-to-r from-brandRed/30 to-brandPink/20 border-2 border-brandGold flex items-center gap-3.5 transition-all cursor-pointer">
+                                <div class="w-12 h-12 rounded-xl bg-brandRed flex items-center justify-center text-2xl shrink-0">👓</div>
+                                <div>
+                                    <div class="font-display font-bold text-base text-white">John Green</div>
+                                    <div class="text-xs text-brandGold font-semibold">The Author // Overthinker</div>
+                                    <div class="text-[11px] text-gray-300 mt-0.5">Loves Diet Dr Pepper, Liverpool FC & weird trivia.</div>
+                                </div>
+                            </button>
+
+                            <!-- Character 2: Jerzy Dudek -->
+                            <button onclick="selectCharacter('dudek')" id="char-btn-dudek" class="w-full text-left p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-3.5 transition-all cursor-pointer">
+                                <div class="w-12 h-12 rounded-xl bg-brandGold/20 text-brandGold flex items-center justify-center text-2xl shrink-0">🧤</div>
+                                <div>
+                                    <div class="font-display font-bold text-base text-white">Jerzy Dudek</div>
+                                    <div class="text-xs text-brandPink font-semibold">Sports Legend // Goalkeeper</div>
+                                    <div class="text-[11px] text-gray-400 mt-0.5">Star of the 2005 Champions League miracle comeback.</div>
+                                </div>
+                            </button>
+
+                            <!-- Character 3: Amy Krouse Rosenthal -->
+                            <button onclick="selectCharacter('amy')" id="char-btn-amy" class="w-full text-left p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-3.5 transition-all cursor-pointer">
+                                <div class="w-12 h-12 rounded-xl bg-brandPink/20 text-brandPink flex items-center justify-center text-2xl shrink-0">✨</div>
+                                <div>
+                                    <div class="font-display font-bold text-base text-white">Amy Krouse Rosenthal</div>
+                                    <div class="text-xs text-brandGold font-semibold">John's Mentor & Friend</div>
+                                    <div class="text-[11px] text-gray-400 mt-0.5">Inspired John to notice joy & pay attention to life.</div>
+                                </div>
+                            </button>
+
+                            <!-- Character 4: Dr Pepper (Personified) -->
+                            <button onclick="selectCharacter('drpepper')" id="char-btn-drpepper" class="w-full text-left p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-3.5 transition-all cursor-pointer">
+                                <div class="w-12 h-12 rounded-xl bg-brandRed/20 text-brandRed flex items-center justify-center text-2xl shrink-0">🥤</div>
+                                <div>
+                                    <div class="font-display font-bold text-base text-white">Diet Dr Pepper</div>
+                                    <div class="text-xs text-brandRed font-semibold">23 Flavors of Pure Chaos</div>
+                                    <div class="text-[11px] text-gray-400 mt-0.5">John's #1 obsession & symbol of human invention.</div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Chat Console -->
+                <div class="lg:col-span-8 flex flex-col bg-white/5 border border-white/15 rounded-3xl overflow-hidden h-[540px]">
+                    <!-- Chat Header -->
+                    <div class="bg-black/60 px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span id="active-char-icon" class="text-2xl">👓</span>
+                            <div>
+                                <h4 id="active-char-name" class="font-display font-bold text-lg leading-none">John Green</h4>
+                                <span class="text-xs text-green-400 font-semibold flex items-center gap-1.5 mt-1">
+                                    <span class="w-2 h-2 rounded-full bg-green-400 inline-block"></span> Online // Ask about any essay or theme
+                                </span>
+                            </div>
+                        </div>
+                        <button onclick="clearChat()" class="text-xs bg-white/10 hover:bg-brandRed/40 px-3 py-1.5 rounded-xl font-bold transition cursor-pointer">
+                            Reset Chat
+                        </button>
+                    </div>
+
+                    <!-- Messages Area -->
+                    <div id="chat-messages" class="flex-1 p-5 overflow-y-auto space-y-4">
+                        <!-- Initial greeting injected by JS -->
+                    </div>
+
+                    <!-- Quick Prompt Chips -->
+                    <div class="px-4 py-2 bg-black/40 border-t border-white/5 flex gap-2 overflow-x-auto no-scrollbar">
+                        <button onclick="sendQuickPrompt('Summarize your main point in 3 sentences like I hate reading.')" class="shrink-0 text-xs bg-white/10 hover:bg-brandPink/30 border border-white/10 px-3 py-1.5 rounded-full text-gray-200 transition cursor-pointer">
+                            ⚡ TL;DR for non-readers
+                        </button>
+                        <button onclick="sendQuickPrompt('What is the best sports or gaming story in the book?')" class="shrink-0 text-xs bg-white/10 hover:bg-brandGold/30 border border-white/10 px-3 py-1.5 rounded-full text-gray-200 transition cursor-pointer">
+                            🎮 Best sports/gaming part?
+                        </button>
+                        <button onclick="sendQuickPrompt('Give me a killer quote or theme I can use for my ELA homework.')" class="shrink-0 text-xs bg-white/10 hover:bg-brandRed/30 border border-white/10 px-3 py-1.5 rounded-full text-gray-200 transition cursor-pointer">
+                            📝 Help with ELA homework
+                        </button>
+                    </div>
+
+                    <!-- Input Form -->
+                    <form onsubmit="handleChatSubmit(event)" class="p-3 bg-black/80 border-t border-white/10 flex gap-2">
+                        <input type="text" id="chat-input" placeholder="Ask John Green anything about the book..." class="flex-1 bg-white/10 border border-white/15 rounded-2xl px-4 py-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-brandPink" required>
+                        <button type="submit" id="chat-send-btn" class="bg-gradient-to-r from-brandRed to-brandPink hover:opacity-90 text-white font-display font-bold px-6 py-3 rounded-2xl transition flex items-center gap-2 cursor-pointer">
+                            <span>SEND</span> <i class="fa-solid fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: MINI-GAME (Guess John Green's 5-Star Rating) -->
+        <div id="view-minigame" class="hidden">
+            <div class="max-w-2xl mx-auto bg-white/5 border border-white/15 rounded-3xl p-6 sm:p-8 text-center relative overflow-hidden">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brandGold/20 text-brandGold text-xs font-bold uppercase mb-4">
+                    <i class="fa-solid fa-trophy"></i> Boss Challenge: Guess The Rating
+                </div>
+                <h3 class="font-display font-black text-2xl sm:text-3xl uppercase mb-2">
+                    HOW MANY STARS DID JOHN GIVE IT?
+                </h3>
+                <p class="text-gray-400 text-sm mb-6">
+                    Test your instincts! Guess the exact star rating John Green gave these real subjects in the book to earn +50 ELA Survival XP per win.
+                </p>
+
+                <!-- Game Card -->
+                <div id="game-card" class="bg-black/80 border-2 border-brandPink/40 rounded-3xl p-6 mb-6">
+                    <div id="game-emoji" class="text-5xl mb-3">🏎️</div>
+                    <h4 id="game-subject" class="font-display font-black text-2xl text-white mb-2">The Indianapolis 500</h4>
+                    <p id="game-clue" class="text-sm text-gray-300 max-w-md mx-auto">
+                        Clue: John grew up in Indy. He talks about the deafening noise, tradition, and watching cars go 230 mph with his son.
+                    </p>
+                </div>
+
+                <!-- Star Buttons -->
+                <div id="star-buttons" class="grid grid-cols-5 gap-2 sm:gap-3 mb-6">
+                    <button onclick="submitGuess(1)" class="py-3 rounded-2xl bg-white/10 hover:bg-brandRed font-display font-black text-lg transition cursor-pointer">1 ★</button>
+                    <button onclick="submitGuess(2)" class="py-3 rounded-2xl bg-white/10 hover:bg-brandRed font-display font-black text-lg transition cursor-pointer">2 ★</button>
+                    <button onclick="submitGuess(3)" class="py-3 rounded-2xl bg-white/10 hover:bg-brandGold hover:text-black font-display font-black text-lg transition cursor-pointer">3 ★</button>
+                    <button onclick="submitGuess(4)" class="py-3 rounded-2xl bg-white/10 hover:bg-brandPink font-display font-black text-lg transition cursor-pointer">4 ★</button>
+                    <button onclick="submitGuess(5)" class="py-3 rounded-2xl bg-white/10 hover:bg-brandGold hover:text-black font-display font-black text-lg transition cursor-pointer">5 ★</button>
+                </div>
+
+                <!-- Result Feedback -->
+                <div id="game-feedback" class="hidden rounded-2xl p-4 mb-4 text-sm font-semibold"></div>
+
+                <button id="next-question-btn" onclick="nextQuestion()" class="hidden w-full py-3.5 rounded-2xl bg-gradient-to-r from-brandGold to-brandRed text-black font-display font-black uppercase tracking-wider cursor-pointer">
+                    Next Round <i class="fa-solid fa-forward ml-1"></i>
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom Modal for Essay Deep-Dive (Replaces alert) -->
+    <div id="essay-modal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-[#140407] border-2 border-brandGold rounded-3xl max-w-lg w-full p-6 sm:p-7 relative shadow-2xl">
+            <button onclick="closeEssayModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-brandRed flex items-center justify-center text-white cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modal-badge" class="inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase mb-2"></div>
+            <h3 id="modal-title" class="font-display font-black text-2xl sm:text-3xl mb-1"></h3>
+            <div id="modal-stars" class="text-brandGold font-black text-lg mb-4"></div>
+            <div class="space-y-4 text-sm text-gray-300">
+                <div>
+                    <div class="text-xs font-bold uppercase text-brandPink mb-1">The Fast Breakdown</div>
+                    <p id="modal-summary" class="leading-relaxed"></p>
+                </div>
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-4">
+                    <div class="text-xs font-bold uppercase text-brandGold mb-1">Why Your ELA Teacher Cares</div>
+                    <p id="modal-ela" class="text-gray-200"></p>
+                </div>
+            </div>
+            <button onclick="closeEssayModal()" class="mt-6 w-full py-3 rounded-2xl bg-brandRed hover:bg-brandPink text-white font-display font-bold uppercase transition cursor-pointer">
+                Got It (+25 XP)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- STATE & DATA ---
+        let currentXP = 50;
+        const maxXP = 500;
+        let currentCharacter = 'john';
+        let chatHistory = [];
+
+        const essaysData = [
+            {
+                id: 1,
+                title: "Super Mario Kart",
+                category: "games",
+                stars: "4.5 / 5 Stars",
+                icon: "🏎️",
+                tag: "Gaming",
+                color: "brandPink",
+                hook: "Why blue shells and rubber-banding are actually fair—and what it teaches us about life.",
+                summary: "John explores how Super Mario Kart uses 'rubber-banding' (giving better items like Blue Shells to players in last place) so everyone stays in the race. He connects it to how human society works best when we help people who fall behind instead of letting one person run away with everything.",
+                elaTakeaway: "Connects video game mechanics to human fairness, privilege, and community support."
+            },
+            {
+                id: 2,
+                title: "Jerzy Dudek's Performance on May 25, 2005",
+                category: "sports",
+                stars: "5 / 5 Stars",
+                icon: "⚽",
+                tag: "Sports",
+                color: "brandRed",
+                hook: "The greatest comeback in soccer history—when Liverpool was down 3-0 at halftime.",
+                summary: "In the 2005 Champions League Final, Liverpool FC was getting destroyed 3-0 by AC Milan. They scored 3 goals in 6 minutes to tie it, and goalkeeper Jerzy Dudek did a goofy 'spaghetti legs' dance during penalty kicks to distract shooters and win the trophy. John explains why impossible sports comebacks give humans hope.",
+                elaTakeaway: "Shows how sports create shared joy and remind us that defeat isn't final until the whistle blows."
+            },
+            {
+                id: 3,
+                title: "Diet Dr Pepper",
+                category: "food",
+                stars: "4 / 5 Stars",
+                icon: "🥤",
+                tag: "Food & Drink",
+                color: "brandGold",
+                hook: "23 mysterious flavors engineered in a lab—and why John is totally obsessed with it.",
+                summary: "John breaks down the history of Dr Pepper (invented in Waco, Texas in 1885) and its mysterious 23 flavors. Even though artificial sweeteners are weird and unnatural, Diet Dr Pepper is his comfort drink that helps him get through stressful writing days.",
+                elaTakeaway: "Illustrates how humans invent artificial comforts to cope with modern stress."
+            },
+            {
+                id: 4,
+                title: "Hot Dog Eating Contest",
+                category: "food",
+                stars: "2.5 / 5 Stars",
+                icon: "🌭",
+                tag: "Food & Sports",
+                color: "brandGold",
+                hook: "Nathan's Famous Fourth of July contest: is eating 70+ hot dogs peak athleticism or pure madness?",
+                summary: "John looks at competitive eating champions like Joey Chestnut and Takeru Kobayashi. While it's technically a feat of human training and willpower, John feels conflicted about celebrating extreme overconsumption while millions of people in the world go hungry.",
+                elaTakeaway: "Explores the contradiction between human ambition/spectacle and global inequality."
+            },
+            {
+                id: 5,
+                title: "The Indianapolis 500",
+                category: "sports",
+                stars: "4 / 5 Stars",
+                icon: "🏁",
+                tag: "Sports",
+                color: "brandRed",
+                hook: "300,000 fans, deafening engines, and drinking milk in Victory Lane.",
+                summary: "Growing up in Indianapolis, John talks about the sensory overload of the Indy 500—the smell of burning rubber, the roar of engines, and taking his young son to see it. It's dangerous and loud, yet it brings an entire city together every year.",
+                elaTakeaway: "Highlights how local traditions and shared rituals build identity and family memories."
+            },
+            {
+                id: 6,
+                title: "Tetris",
+                category: "games",
+                stars: "5 / 5 Stars",
+                icon: "🧱",
+                tag: "Gaming",
+                color: "brandPink",
+                hook: "Why our brains get addicted to stacking falling blocks—even in our dreams.",
+                summary: "Created in the Soviet Union in 1984, Tetris became a global phenomenon. John talks about the 'Tetris Effect'—when you play so much you start seeing falling blocks when you close your eyes—and how organizing chaos on a screen calms our anxious brains.",
+                elaTakeaway: "Shows how humans crave order and control in a messy, unpredictable world."
+            }
+        ];
+
+        const characters = {
+            john: {
+                name: "John Green",
+                icon: "👓",
+                greeting: "Hey! I'm John Green. Look, I know being forced to read a book for ELA class is rough—I used to hate school assignments too. Ask me anything about *The Anthropocene Reviewed*, or tell me what kind of games, food, or sports you're into and I'll tell you which essay matches your vibe!",
+                systemPrompt: "You are John Green, author of 'The Anthropocene Reviewed'. You are talking to a high school student who hates reading and hates ELA class, and loves games, sports, and food. Be encouraging, funny, conversational, and relatable. Never sound like a boring textbook. Connect themes and essays from 'The Anthropocene Reviewed' (like Mario Kart, Tetris, Jerzy Dudek/Liverpool FC, Diet Dr Pepper, Indy 500, Hot Dog Eating Contest, or the 5-star rating system) to their questions in punchy, easy-to-read responses (2-4 short paragraphs max)."
+            },
+            dudek: {
+                name: "Jerzy Dudek",
+                icon: "🧤",
+                greeting: "Cześć! I'm Jerzy Dudek, goalkeeper for Liverpool FC in the 2005 Champions League Final! Down 3-0 at halftime against AC Milan, nobody gave us a chance. Ask me about the miracle in Istanbul or why John gave my game 5 stars!",
+                systemPrompt: "You are Jerzy Dudek, the legendary Polish soccer goalkeeper featured in John Green's essay 'Jerzy Dudek's Performance on May 25, 2005'. Speak with athlete energy, sportsmanship, and enthusiasm. Explain how your miraculous double save and 'spaghetti legs' penalty shootout dance fit into John Green's themes of hope, teamwork, and impossible comebacks in 'The Anthropocene Reviewed'. Keep it punchy and fun for a high school student."
+            },
+            amy: {
+                name: "Amy Krouse Rosenthal",
+                icon: "✨",
+                greeting: "Hi there! I'm Amy. John writes about me in the book because I loved noticing the tiny, magical details in everyday life. Need help finding the deeper meaning in this book without falling asleep? Let's talk!",
+                systemPrompt: "You are Amy Krouse Rosenthal, the late author and friend/mentor to John Green featured in 'The Anthropocene Reviewed'. You are warm, witty, and observant. Help a high school student who dislikes reading understand why John Green reviews ordinary objects—it's all about paying attention and finding joy in being alive. Keep answers concise, warm, and super helpful for ELA class."
+            },
+            drpepper: {
+                name: "Diet Dr Pepper",
+                icon: "🥤",
+                greeting: "*PSSSHHH—FIZZ!* What's up! I'm a cold can of Diet Dr Pepper—23 mysterious flavors engineered in a lab and John Green's ultimate comfort drink. Ask me why I'm in a serious ELA book!",
+                systemPrompt: "You are an anthropomorphic, energetic can of Diet Dr Pepper, one of John Green's favorite subjects in 'The Anthropocene Reviewed'. Speak with bubbly, comedic energy. Explain what you represent in the book: human ingenuity, artificial comforts in the Anthropocene era, and how small everyday pleasures help people survive stress. Keep it short, funny, and helpful for a teenager."
+            }
+        };
+
+        const quizQuestions = [
+            {
+                emoji: "🏎️",
+                subject: "The Indianapolis 500",
+                clue: "John grew up in Indy. He loves the tradition, the roar of 33 engines, and sharing it with his son—even though racing is dangerous.",
+                answer: 4,
+                explanation: "John gave the Indy 500 4 stars! He loves the community spirit and family tradition, docking 1 star for the danger and environmental impact."
+            },
+            {
+                emoji: "⚽",
+                subject: "Jerzy Dudek's 2005 Champions League Final",
+                clue: "Liverpool FC came back from 3-0 down at halftime to win on penalty kicks. Pure sports magic.",
+                answer: 5,
+                explanation: "5 out of 5 stars! To John, this miracle comeback represents pure human joy and hope against impossible odds."
+            },
+            {
+                emoji: "🌭",
+                subject: "Nathan's Famous Hot Dog Eating Contest",
+                clue: "Competitive eaters scarfing down 70+ hot dogs in 10 minutes on the 4th of July. Impressive, yet kind of gross.",
+                answer: 2,
+                explanation: "John gave it 2.5 stars (rounded to 2 here!). He respects the athleticism, but feels weird celebrating extreme overeating while people starve."
+            },
+            {
+                emoji: "🧱",
+                subject: "Tetris",
+                clue: "The classic Soviet block-stacking puzzle game that helps calm anxious brains.",
+                answer: 5,
+                explanation: "5 stars! John loves how Tetris lets humans bring temporary order to chaos."
+            },
+            {
+                emoji: "🦟",
+                subject: "Aedes aegypti (Yellow Fever Mosquitoes)",
+                clue: "Deadly disease-carrying mosquitoes that have killed billions of humans throughout history.",
+                answer: 1,
+                explanation: "1 star! John rarely gives 1 star, but disease-carrying mosquitoes definitely earned it."
+            }
+        ];
+        let currentQuizIndex = 0;
+
+        // --- XP SYSTEM ---
+        function addXP(amount) {
+            currentXP = Math.min(maxXP, currentXP + amount);
+            document.getElementById('xp-display').textContent = `${currentXP} / ${maxXP} XP`;
+            const pct = (currentXP / maxXP) * 100;
+            document.getElementById('xp-bar').style.width = `${pct}%`;
+        }
+
+        // --- NAVIGATION TABS ---
+        function switchTab(tabName) {
+            const tabs = ['arena', 'themes', 'chat', 'minigame'];
+            tabs.forEach(t => {
+                const view = document.getElementById(`view-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    view.classList.remove('hidden');
+                    btn.classList.add('tab-active');
+                    btn.classList.remove('bg-white/5', 'border', 'border-white/10');
+                } else {
+                    view.classList.add('hidden');
+                    btn.classList.remove('tab-active');
+                    btn.classList.add('bg-white/5', 'border', 'border-white/10');
+                }
+            });
+            addXP(10);
+        }
+
+        // --- ESSAY CARDS & FILTERING ---
+        function renderEssays(filter = 'all') {
+            const grid = document.getElementById('essay-grid');
+            grid.innerHTML = '';
+
+            const filtered = filter === 'all'
+                ? essaysData
+                : essaysData.filter(e => e.category === filter);
+
+            filtered.forEach(essay => {
+                const badgeColor = essay.color === 'brandPink'
+                    ? 'bg-brandPink/20 text-brandPink border-brandPink/30'
+                    : essay.color === 'brandRed'
+                    ? 'bg-brandRed/20 text-brandRed border-brandRed/30'
+                    : 'bg-brandGold/20 text-brandGold border-brandGold/30';
+
+                const card = document.createElement('div');
+                card.className = 'bg-white/5 arcade-border rounded-3xl p-6 flex flex-col justify-between';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between gap-2 mb-4">
+                            <span class="px-3 py-1 rounded-xl border text-xs font-bold uppercase ${badgeColor}">
+                                ${essay.tag}
+                            </span>
+                            <span class="text-brandGold font-display font-black text-sm">
+                                ${essay.stars}
+                            </span>
+                        </div>
+                        <div class="text-4xl mb-3">${essay.icon}</div>
+                        <h4 class="font-display font-bold text-xl text-white mb-2 leading-snug">${essay.title}</h4>
+                        <p class="text-gray-400 text-sm leading-relaxed mb-5">${essay.hook}</p>
+                    </div>
+                    <button onclick="openEssayModal(${essay.id})" class="w-full py-3 rounded-2xl bg-white/10 hover:bg-gradient-to-r hover:from-brandRed hover:to-brandPink text-white font-display font-bold text-xs uppercase tracking-wider transition cursor-pointer">
+                        Unlock Breakdown <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterEssays(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                if (btn.dataset.filter === category) {
+                    btn.className = 'filter-btn bg-brandGold text-black font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider cursor-pointer';
+                } else {
+                    btn.className = 'filter-btn bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl text-xs uppercase tracking-wider cursor-pointer';
+                }
+            });
+            renderEssays(category);
+        }
+
+        function openEssayModal(id) {
+            const essay = essaysData.find(e => e.id === id);
+            if (!essay) return;
+
+            document.getElementById('modal-badge').textContent = essay.tag;
+            document.getElementById('modal-badge').className = 'inline-block px-3 py-1 rounded-lg text-xs font-bold uppercase mb-2 bg-brandPink/20 text-brandPink';
+            document.getElementById('modal-title').textContent = essay.title;
+            document.getElementById('modal-stars').textContent = `John's Rating: ${essay.stars}`;
+            document.getElementById('modal-summary').textContent = essay.summary;
+            document.getElementById('modal-ela').textContent = essay.elaTakeaway;
+
+            document.getElementById('essay-modal').classList.remove('hidden');
+            addXP(25);
+        }
+
+        function closeEssayModal() {
+            document.getElementById('essay-modal').classList.add('hidden');
+        }
+
+        // --- LIVE AI CHARACTER CHAT (GEMINI API) ---
+        function selectCharacter(charKey) {
+            currentCharacter = charKey;
+            const char = characters[charKey];
+
+            // Update active button styling
+            Object.keys(characters).forEach(key => {
+                const btn = document.getElementById(`char-btn-${key}`);
+                if (key === charKey) {
+                    btn.className = 'w-full text-left p-3.5 rounded-2xl bg-gradient-to-r from-brandRed/30 to-brandPink/20 border-2 border-brandGold flex items-center gap-3.5 transition-all cursor-pointer';
+                } else {
+                    btn.className = 'w-full text-left p-3.5 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-3.5 transition-all cursor-pointer';
+                }
+            });
+
+            document.getElementById('active-char-icon').textContent = char.icon;
+            document.getElementById('active-char-name').textContent = char.name;
+            document.getElementById('chat-input').placeholder = `Ask ${char.name} anything about the book...`;
+
+            clearChat();
+        }
+
+        function clearChat() {
+            chatHistory = [];
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.innerHTML = '';
+            appendMessage('bot', characters[currentCharacter].greeting);
+        }
+
+        function appendMessage(sender, text) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const wrapper = document.createElement('div');
+            wrapper.className = sender === 'user' ? 'flex justify-end' : 'flex justify-start items-start gap-2.5';
+
+            if (sender === 'user') {
+                wrapper.innerHTML = `
+                    <div class="max-w-[80%] bg-gradient-to-r from-brandRed to-brandPink text-white px-4 py-3 rounded-2xl rounded-tr-sm text-sm leading-relaxed shadow-md">
+                        ${escapeHTML(text)}
+                    </div>
+                `;
+            } else {
+                wrapper.innerHTML = `
+                    <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-base shrink-0 mt-1">
+                        ${characters[currentCharacter].icon}
+                    </div>
+                    <div class="max-w-[82%] bg-black/70 border border-white/15 text-gray-100 px-4 py-3 rounded-2xl rounded-tl-sm text-sm leading-relaxed">
+                        ${formatBotText(text)}
+                    </div>
+                `;
+            }
+
+            messagesDiv.appendChild(wrapper);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const messagesDiv = document.getElementById('chat-messages');
+            const indicator = document.createElement('div');
+            indicator.id = 'typing-indicator';
+            indicator.className = 'flex justify-start items-center gap-2.5';
+            indicator.innerHTML = `
+                <div class="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-base shrink-0">
+                    ${characters[currentCharacter].icon}
+                </div>
+                <div class="bg-black/70 border border-white/15 px-4 py-3 rounded-2xl flex gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-brandGold typing-dot"></span>
+                    <span class="w-2 h-2 rounded-full bg-brandPink typing-dot"></span>
+                    <span class="w-2 h-2 rounded-full bg-brandRed typing-dot"></span>
+                </div>
+            `;
+            messagesDiv.appendChild(indicator);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+        }
+
+        function sendQuickPrompt(promptText) {
+            document.getElementById('chat-input').value = promptText;
+            handleChatSubmit(new Event('submit'));
+        }
+
+        async function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('chat-input');
+            const userText = input.value.trim();
+            if (!userText) return;
+
+            input.value = '';
+            appendMessage('user', userText);
+            addXP(15);
+
+            chatHistory.push({ role: 'user', parts: [{ text: userText }] });
+            showTypingIndicator();
+
+            const reply = await callGeminiWithBackoff(chatHistory, characters[currentCharacter].systemPrompt);
+            removeTypingIndicator();
+
+            appendMessage('bot', reply);
+            chatHistory.push({ role: 'model', parts: [{ text: reply }] });
+        }
+
+        async function callGeminiWithBackoff(contents, systemInstructionText) {
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: contents,
+                systemInstruction: {
+                    parts: [{ text: systemInstructionText }]
+                }
+            };
+
+            const delays = [1000, 2000, 4000, 8000];
+            for (let attempt = 0; attempt <= delays.length; attempt++) {
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+
+                    const result = await response.json();
+                    const text = result?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) return text;
+                    throw new Error("Empty response");
+                } catch (err) {
+                    if (attempt === delays.length) {
+                        return "Whoa, my connection glitched for a second! Try asking me that again—I'm ready.";
+                    }
+                    await new Promise(res => setTimeout(res, delays[attempt]));
+                }
+            }
+        }
+
+        // --- MINI-GAME: GUESS THE STARS ---
+        function loadQuizQuestion() {
+            const q = quizQuestions[currentQuizIndex];
+            document.getElementById('game-emoji').textContent = q.emoji;
+            document.getElementById('game-subject').textContent = q.subject;
+            document.getElementById('game-clue').textContent = `Clue: ${q.clue}`;
+
+            document.getElementById('game-feedback').classList.add('hidden');
+            document.getElementById('next-question-btn').classList.add('hidden');
+            document.getElementById('star-buttons').classList.remove('pointer-events-none', 'opacity-50');
+        }
+
+        function submitGuess(stars) {
+            const q = quizQuestions[currentQuizIndex];
+            const feedback = document.getElementById('game-feedback');
+            feedback.classList.remove('hidden');
+
+            document.getElementById('star-buttons').classList.add('pointer-events-none', 'opacity-50');
+            document.getElementById('next-question-btn').classList.remove('hidden');
+
+            if (stars === q.answer) {
+                feedback.className = 'rounded-2xl p-4 mb-4 text-sm font-semibold bg-green-500/20 border border-green-500 text-green-200';
+                feedback.innerHTML = `<div class="font-black text-base mb-1">🎯 BOOM! NAILED IT! (+50 XP)</div>${q.explanation}`;
+                addXP(50);
+            } else {
+                feedback.className = 'rounded-2xl p-4 mb-4 text-sm font-semibold bg-brandRed/20 border border-brandRed text-red-200';
+                feedback.innerHTML = `<div class="font-black text-base mb-1">CLOSE! You guessed ${stars} ★, actual was ${q.answer} ★ (+15 XP)</div>${q.explanation}`;
+                addXP(15);
+            }
+        }
+
+        function nextQuestion() {
+            currentQuizIndex = (currentQuizIndex + 1) % quizQuestions.length;
+            loadQuizQuestion();
+        }
+
+        // --- HELPERS ---
+        function escapeHTML(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function formatBotText(text) {
+            // Simple bold and line break formatting
+            let safe = escapeHTML(text);
+            safe = safe.replace(/\*\*(.*?)\*\*/g, '<strong class="text-brandGold">$1</strong>');
+            safe = safe.replace(/\*(.*?)\*/g, '<em class="text-brandPink">$1</em>');
+            safe = safe.replace(/\n/g, '<br>');
+            return safe;
+        }
+
+        // --- INIT ---
+        window.onload = function() {
+            renderEssays('all');
+            selectCharacter('john');
+            loadQuizQuestion();
+        };
+    </script>
+</body>
+</html>
