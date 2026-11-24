@@ -1,1 +1,1491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mimics to Survive | Roblox Blox Arena</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Russo+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --crimson: #e01f27;
+            --obsidian: #0a0102;
+            --gold: #f4bc22;
+            --neon-pink: #ff00d3;
+            --ice-blue: #38bdf8;
+            --white: #ffffff;
+            --grey: #2d2628;
+            --light-grey: #8c8285;
+        }
 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--obsidian);
+            color: var(--white);
+            font-family: 'Chakra Petch', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            overflow-x: hidden;
+            background-image:
+                radial-gradient(circle at 15% 20%, rgba(224, 31, 39, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 85% 80%, rgba(255, 0, 211, 0.16) 0%, transparent 45%);
+        }
+
+        /* Header Title Banner */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 10px;
+            width: 100%;
+            max-width: 900px;
+        }
+
+        h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(1.3rem, 3.6vw, 2.2rem);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--white);
+            text-shadow: 0 0 12px rgba(224, 31, 39, 0.8), 3px 3px 0px var(--crimson);
+        }
+
+        h1 span {
+            color: var(--gold);
+            text-shadow: 0 0 12px rgba(244, 188, 34, 0.7), 3px 3px 0px var(--neon-pink);
+        }
+
+        #pause-btn {
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(0.85rem, 2vw, 1rem);
+            letter-spacing: 1px;
+            padding: 8px 16px;
+            border-radius: 10px;
+            border: 2px solid var(--gold);
+            background: linear-gradient(180deg, #2b0d13 0%, #0a0102 100%);
+            color: var(--gold);
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--crimson);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        #pause-btn:hover:not(:disabled) {
+            border-color: var(--pink);
+            color: var(--white);
+            transform: translateY(-1px);
+        }
+
+        #pause-btn:active:not(:disabled) {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 var(--crimson);
+        }
+
+        #pause-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        h1 {
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(1.5rem, 4vw, 2.4rem);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--white);
+            text-shadow: 0 0 12px rgba(224, 31, 39, 0.8), 3px 3px 0px var(--crimson);
+        }
+
+        h1 span {
+            color: var(--gold);
+            text-shadow: 0 0 12px rgba(244, 188, 34, 0.7), 3px 3px 0px var(--neon-pink);
+        }
+
+        /* Arena Container */
+        #game-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            aspect-ratio: 16 / 10;
+            max-height: 62vh;
+            border: 4px solid var(--crimson);
+            border-radius: 16px;
+            box-shadow: 0 0 28px rgba(224, 31, 39, 0.45), 0 0 12px rgba(255, 0, 211, 0.35);
+            background-color: var(--obsidian);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Tactile Controls Bar Below Canvas */
+        #controls-bar {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            width: 100%;
+            max-width: 900px;
+            margin-top: 12px;
+        }
+
+        .ctrl-btn {
+            background: linear-gradient(180deg, #1f1618 0%, #0a0102 100%);
+            border: 2px solid var(--light-grey);
+            border-radius: 12px;
+            color: var(--white);
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(0.8rem, 2.1vw, 1.05rem);
+            padding: 10px 6px;
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 5px 0 var(--grey);
+            transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.12s ease;
+            touch-action: manipulation;
+        }
+
+        .ctrl-btn:hover:not(:disabled),
+        .ctrl-btn.active {
+            border-color: var(--gold);
+            background: linear-gradient(180deg, #361319 0%, #140407 100%);
+            transform: translateY(2px);
+            box-shadow: 0 3px 0 var(--crimson);
+        }
+
+        .ctrl-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 var(--neon-pink);
+        }
+
+        .ctrl-btn span.key-hint {
+            display: block;
+            font-family: 'Chakra Petch', sans-serif;
+            font-size: 0.72rem;
+            color: var(--gold);
+            margin-top: 2px;
+        }
+
+        /* Elemental Power Buttons */
+        .power-btn {
+            border-color: var(--crimson);
+            box-shadow: 0 5px 0 var(--neon-pink);
+            background: linear-gradient(180deg, #330d14 0%, #120406 100%);
+        }
+
+        .power-btn.ice {
+            border-color: var(--ice-blue);
+            box-shadow: 0 5px 0 #0284c7;
+            background: linear-gradient(180deg, #0c2738 0%, #0a0102 100%);
+        }
+
+        .power-btn:disabled {
+            opacity: 0.48;
+            cursor: not-allowed;
+            transform: none;
+            filter: grayscale(0.5);
+        }
+
+        /* Overlay Screens (Start, Game Over) */
+        #overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(10, 1, 2, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            text-align: center;
+            z-index: 10;
+            backdrop-filter: blur(4px);
+        }
+
+        #overlay.hidden {
+            display: none;
+        }
+
+        #overlay h2 {
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(1.5rem, 4.5vw, 2.7rem);
+            color: var(--gold);
+            text-shadow: 0 0 18px rgba(244, 188, 34, 0.6), 3px 3px 0 var(--crimson);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        #overlay p {
+            max-width: 640px;
+            font-size: clamp(0.9rem, 2.1vw, 1.08rem);
+            line-height: 1.45;
+            color: var(--white);
+            margin-bottom: 18px;
+        }
+
+        .highlight-red { color: var(--crimson); font-weight: 700; }
+        .highlight-gold { color: var(--gold); font-weight: 700; }
+        .highlight-pink { color: var(--neon-pink); font-weight: 700; }
+        .highlight-ice { color: var(--ice-blue); font-weight: 700; }
+
+        #action-btn {
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(1.1rem, 2.8vw, 1.45rem);
+            letter-spacing: 1.5px;
+            padding: 13px 34px;
+            border-radius: 14px;
+            border: 3px solid var(--gold);
+            background: linear-gradient(135deg, var(--crimson) 0%, #9b1118 100%);
+            color: var(--white);
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--neon-pink), 0 0 24px rgba(224, 31, 39, 0.7);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        #action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 0 var(--neon-pink), 0 0 32px rgba(244, 188, 34, 0.9);
+        }
+
+        #action-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--neon-pink);
+        }
+
+        .mode-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .mode-btn {
+            font-family: 'Russo One', sans-serif;
+            font-size: clamp(0.9rem, 2.3vw, 1.1rem);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 2.5px solid var(--light-grey);
+            background: #1a1113;
+            color: var(--white);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .mode-btn.selected {
+            border-color: var(--gold);
+            background: linear-gradient(135deg, #3b0d15 0%, #1d060b 100%);
+            color: var(--gold);
+            box-shadow: 0 0 16px rgba(244, 188, 34, 0.55);
+        }
+
+        @media (max-width: 720px) {
+            #controls-bar {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>ROBLOX <span>MIMICS</span> OBBY</h1>
+        <button id="pause-btn" disabled>⏸ PAUSE [P]</button>
+    </header>
+
+    <div id="game-wrapper">
+        <canvas id="arenaCanvas"></canvas>
+
+        <!-- Pause Overlay -->
+        <div id="pause-overlay" class="hidden" style="position: absolute; inset: 0; background: rgba(10, 1, 2, 0.85); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9; backdrop-filter: blur(4px); text-align: center; padding: 20px;">
+            <h2 style="font-family: 'Russo One', sans-serif; font-size: clamp(1.8rem, 5vw, 3rem); color: var(--gold); text-shadow: 0 0 18px rgba(244, 188, 34, 0.7), 3px 3px 0 var(--crimson); margin-bottom: 10px;">GAME PAUSED</h2>
+            <p style="color: var(--white); font-size: 1.05rem; margin-bottom: 20px;">Press <span class="highlight-gold">[P]</span>, <span class="highlight-gold">[ESC]</span>, or click Resume to jump back into the arena.</p>
+            <button id="resume-btn" style="font-family: 'Russo One', sans-serif; font-size: 1.2rem; padding: 12px 32px; border-radius: 12px; border: 3px solid var(--gold); background: linear-gradient(135deg, var(--crimson) 0%, #9b1118 100%); color: var(--white); cursor: pointer; box-shadow: 0 5px 0 var(--neon-pink);">▶ RESUME MATCH</button>
+        </div>
+
+        <!-- Start / Game Over Overlay -->
+        <div id="overlay">
+            <h2 id="overlay-title">BLOX ARENA OBBY</h2>
+            <p id="overlay-desc">
+                Welcome to <span class="highlight-gold">ROBLOX MIMICS</span>! Watch the <span class="highlight-red">BLOX RIVALS</span> on the studio baseplate and mimic every move (<span class="highlight-gold">LEFT, RIGHT, JUMP, DUCK</span>) before the timer runs out!<br>
+                In <span class="highlight-pink">2 RIVALS (1v2)</span> mode, both blocky rivals team up and alternate moves!<br><br>
+                <span class="highlight-red">[B] FIRE GEAR:</span> Blasts <span class="highlight-gold">1/2 (0.5)</span> of active rival's HP!<br>
+                <span class="highlight-ice">[K] FREEZE COIL:</span> Encases rivals in ice for <span class="highlight-gold">3 seconds</span>! (1-min cooldown)
+            </p>
+            <div class="mode-selector">
+                <button class="mode-btn selected" id="mode-1v1" data-rivals="1">1 RIVAL (1v1)</button>
+                <button class="mode-btn" id="mode-1v2" data-rivals="2">2 RIVALS (1v2)</button>
+            </div>
+            <button id="action-btn">PLAY OBBY</button>
+        </div>
+    </div>
+
+    <!-- Tactile Controls Bar (Works with Keyboard, Mouse & Touch) -->
+    <div id="controls-bar">
+        <button class="ctrl-btn" data-move="LEFT">
+            ◀ LEFT
+            <span class="key-hint">[A] or [◀]</span>
+        </button>
+        <button class="ctrl-btn" data-move="UP">
+            ▲ JUMP
+            <span class="key-hint">[W] or [▲]</span>
+        </button>
+        <button class="ctrl-btn" data-move="DOWN">
+            ▼ DUCK
+            <span class="key-hint">[S] or [▼]</span>
+        </button>
+        <button class="ctrl-btn" data-move="RIGHT">
+            RIGHT ▶
+            <span class="key-hint">[D] or [▶]</span>
+        </button>
+        <button class="ctrl-btn power-btn" id="btn-fire">
+            🔥 FIRE
+            <span class="key-hint" id="hint-fire">[B] READY</span>
+        </button>
+        <button class="ctrl-btn power-btn ice" id="btn-freeze">
+            ❄️ FREEZE
+            <span class="key-hint" id="hint-freeze">[K] READY</span>
+        </button>
+    </div>
+
+    <script>
+        /* ==========================================================================
+           1. TWEAKABLE SPEED, JUMP/GRAVITY, SPAWN RATE & POWER CONSTANTS
+           ========================================================================== */
+        const PLAYER_MOVE_SPEED = 480;       // Horizontal dash speed in pixels per second
+        const JUMP_IMPULSE = -620;           // Upward jump velocity (negative goes up)
+        const GRAVITY_FORCE = 1850;          // Downward gravity pull when jumping
+        const ENEMY_MOVE_INTERVAL = 0.55;    // Spawn rate of enemy moves in seconds (lower = faster)
+        const BASE_MIMIC_TIME_LIMIT = 4.0;   // Seconds allowed for player to mimic the sequence
+        const STARTING_LIVES = 3;            // Starting lives for both Player and Rival
+        const INITIAL_SEQUENCE_LENGTH = 3;   // How many moves the Rival does in Round 1
+
+        // Elemental Power Constants
+        const POWER_COOLDOWN_SECONDS = 60.0; // 1 minute cooldown for Fire & Freeze powers
+        const FIRE_POWER_DAMAGE = 0.5;       // Fire power takes 1/2 (0.5) of a life
+        const FREEZE_POWER_DURATION = 3.0;   // Freeze power locks moves for 3 seconds
+
+        /* ==========================================================================
+           2. FAVORITE HIGH-CONTRAST COLOR PALETTE & AUDIO SYNTHESIZER (NO EXTERNAL URLS)
+           ========================================================================== */
+        const COLORS = {
+            bg: '#0a0102',
+            crimson: '#e01f27',
+            gold: '#f4bc22',
+            pink: '#ff00d3',
+            white: '#ffffff',
+            grey: '#3a3234',
+            lightGrey: '#8c8285',
+            ice: '#38bdf8'
+        };
+
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+                if (this.ctx && this.ctx.state === 'suspended') {
+                    this.ctx.resume();
+                }
+            },
+            playTone(freq, type, duration, volume = 0.18, slideTo = null) {
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, now);
+                    if (slideTo) {
+                        osc.frequency.exponentialRampToValueAtTime(slideTo, now + duration);
+                    }
+                    gain.gain.setValueAtTime(volume, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + duration);
+                } catch (e) {
+                    // Fail silently if audio context is restricted
+                }
+            },
+            enemyMove(move) {
+                const notes = { LEFT: 261.63, RIGHT: 329.63, UP: 392.00, DOWN: 196.00 };
+                this.playTone(notes[move] || 300, 'triangle', 0.16, 0.16);
+            },
+            playerStep(index) {
+                const base = 340 + index * 65;
+                this.playTone(base, 'sine', 0.14, 0.18, base * 1.15);
+            },
+            roundWin() {
+                this.playTone(440, 'square', 0.12, 0.16);
+                setTimeout(() => this.playTone(554.37, 'square', 0.12, 0.16), 90);
+                setTimeout(() => this.playTone(659.25, 'square', 0.28, 0.2), 180);
+            },
+            hitFail() {
+                this.playTone(180, 'sawtooth', 0.35, 0.22, 65);
+            },
+            fireBlast() {
+                this.playTone(150, 'sawtooth', 0.4, 0.24, 45);
+                setTimeout(() => this.playTone(300, 'square', 0.25, 0.16, 85), 55);
+            },
+            freezeCast() {
+                this.playTone(880, 'sine', 0.35, 0.18, 1320);
+                setTimeout(() => this.playTone(1174, 'triangle', 0.3, 0.15, 1567), 75);
+            }
+        };
+
+        /* ==========================================================================
+           3. GAME STATE & RESPONSIVE CANVAS SETUP
+           ========================================================================== */
+        const canvas = document.getElementById('arenaCanvas');
+        const ctx = canvas.getContext('2d');
+        const overlay = document.getElementById('overlay');
+        const overlayTitle = document.getElementById('overlay-title');
+        const overlayDesc = document.getElementById('overlay-desc');
+        const actionBtn = document.getElementById('action-btn');
+        const controlBtns = document.querySelectorAll('.ctrl-btn[data-move]');
+        const btnFire = document.getElementById('btn-fire');
+        const btnFreeze = document.getElementById('btn-freeze');
+        const hintFire = document.getElementById('hint-fire');
+        const hintFreeze = document.getElementById('hint-freeze');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const pauseOverlay = document.getElementById('pause-overlay');
+        const resumeBtn = document.getElementById('resume-btn');
+
+        // Ensure pause overlay starts hidden (overrides inline flex display)
+        pauseOverlay.style.display = 'none';
+
+        const MOVES = ['LEFT', 'RIGHT', 'UP', 'DOWN'];
+        let width = 900;
+        let height = 562;
+        let selectedRivalCount = 1; // 1 = 1v1, 2 = 1v2 Tag-Team
+        let isPaused = false;
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            width = Math.max(300, Math.floor(rect.width));
+            height = Math.max(200, Math.floor(rect.height));
+            canvas.width = width * dpr;
+            canvas.height = height * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        modeBtns.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                modeBtns.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                selectedRivalCount = parseInt(btn.getAttribute('data-rivals'), 10) || 1;
+            });
+        });
+
+        function togglePause() {
+            if (game.state === 'TITLE' || game.state === 'GAME_OVER') return;
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseOverlay.style.display = 'flex';
+                pauseBtn.textContent = '▶ RESUME [P]';
+            } else {
+                pauseOverlay.style.display = 'none';
+                pauseBtn.textContent = '⏸ PAUSE [P]';
+                lastTime = performance.now(); // Prevent dt jump after unpausing
+            }
+        }
+
+        pauseBtn.addEventListener('click', togglePause);
+        resumeBtn.addEventListener('click', togglePause);
+        const game = {
+            state: 'TITLE', // TITLE | ENEMY_DEMO | PLAYER_TURN | ROUND_RESULT | GAME_OVER
+            round: 1,
+            rivalCount: 1,
+            playerLives: STARTING_LIVES,
+            enemyLives: STARTING_LIVES,
+            sequence: [],
+            sequenceActors: [], // Tracks which rival performed each move in 1v2 mode
+            demoIndex: 0,
+            demoTimer: 0,
+            playerStep: 0,
+            turnTimer: BASE_MIMIC_TIME_LIMIT,
+            maxTurnTime: BASE_MIMIC_TIME_LIMIT,
+            resultTimer: 0,
+            bannerText: 'GET READY!',
+            bannerColor: COLORS.gold,
+            shakeTime: 0,
+            shakeMagnitude: 0,
+            particles: [],
+            lasers: [],
+            enemyPowerTimer: 12 // Rival also uses Fire/Freeze powers!
+        };
+
+        function createFighter(isEnemy, rivalSlot = 0) {
+            return {
+                isEnemy,
+                rivalSlot,         // 0 = Center (1v1) or Left Rival (1v2), 1 = Right Rival (1v2)
+                lives: STARTING_LIVES,
+                laneOffset: 0,     // -1 (Left), 0 (Center), 1 (Right)
+                xOffset: 0,        // Smooth visual X displacement in pixels
+                yJump: 0,          // Vertical jump displacement
+                vy: 0,             // Vertical velocity
+                squish: 1,         // Scale Y for ducking/jumping squash & stretch
+                duckTimer: 0,
+                flashTimer: 0,
+                activeMove: null,
+                moveBadgeTimer: 0,
+                frozenTimer: 0,    // Time remaining frozen (moves locked)
+                fireCooldown: 0,   // Cooldown timer for Fire power
+                freezeCooldown: 0  // Cooldown timer for Freeze power
+            };
+        }
+
+        let player = createFighter(false, 0);
+        let enemies = [createFighter(true, 0)];
+
+        function getRivalAnchorX(rival) {
+            const centerX = width / 2;
+            if (enemies.length === 1) return centerX + rival.xOffset;
+            const splitOffset = Math.min(width * 0.21, 175);
+            const baseAnchor = rival.rivalSlot === 0 ? centerX - splitOffset : centerX + splitOffset;
+            return baseAnchor + rival.xOffset;
+        }
+
+        function getActiveTargetRival() {
+            return enemies.find(e => e.lives > 0) || enemies[0];
+        }
+
+        function getTotalRivalLives() {
+            return enemies.reduce((sum, e) => sum + e.lives, 0);
+        }
+
+        /* ==========================================================================
+           4. VISUAL EFFECTS (PARTICLES, BEAMS & SCREEN SHAKE)
+           ========================================================================== */
+        function triggerShake(duration, magnitude) {
+            game.shakeTime = duration;
+            game.shakeMagnitude = magnitude;
+        }
+
+        function spawnParticles(x, y, color, count = 18) {
+            for (let i = 0; i < count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 90 + Math.random() * 260;
+                game.particles.push({
+                    x,
+                    y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: 4 + Math.random() * 6,
+                    color,
+                    life: 0.45 + Math.random() * 0.35,
+                    maxLife: 0.8
+                });
+            }
+        }
+        function spawnBeam(fromEnemy, color, rivalRef = null) {
+            game.lasers.push({
+                fromEnemy,
+                rivalRef: rivalRef || getActiveTargetRival(),
+                color,
+                life: 0.35,
+                maxLife: 0.35
+            });
+        }
+
+        /* ==========================================================================
+           5. FIGHTER ACTIONS, POWERS & ROUND FLOW LOGIC
+           ========================================================================== */
+        function performFighterMove(fighter, move) {
+            if (fighter.frozenTimer > 0) return; // Cannot move while frozen!
+
+            fighter.activeMove = move;
+            fighter.moveBadgeTimer = 0.55;
+
+            if (move === 'LEFT') {
+                fighter.laneOffset = Math.max(-1, fighter.laneOffset - 1);
+                if (fighter.laneOffset === 0 && move === 'LEFT') fighter.laneOffset = -1;
+            } else if (move === 'RIGHT') {
+                fighter.laneOffset = Math.min(1, fighter.laneOffset + 1);
+                if (fighter.laneOffset === 0 && move === 'RIGHT') fighter.laneOffset = 1;
+            } else if (move === 'UP') {
+                fighter.vy = JUMP_IMPULSE;
+                fighter.squish = 1.28;
+            } else if (move === 'DOWN') {
+                fighter.duckTimer = 0.38;
+                fighter.squish = 0.52;
+            }
+        }
+
+        function resetFighterPositions() {
+            player.laneOffset = 0;
+            player.xOffset = 0;
+            player.yJump = 0;
+            player.vy = 0;
+            player.duckTimer = 0;
+            player.squish = 1;
+
+            enemies.forEach((r) => {
+                r.laneOffset = 0;
+                r.xOffset = 0;
+                r.yJump = 0;
+                r.vy = 0;
+                r.duckTimer = 0;
+                r.squish = 1;
+            });
+        }
+
+        function startNewGame() {
+            AudioFX.init();
+            isPaused = false;
+            pauseOverlay.style.display = 'none';
+            pauseBtn.disabled = false;
+            pauseBtn.textContent = '⏸ PAUSE [P]';
+            game.round = 1;
+            game.rivalCount = selectedRivalCount;
+            game.playerLives = STARTING_LIVES;
+            game.particles = [];
+            game.lasers = [];
+            game.enemyPowerTimer = 10 + Math.random() * 6;
+            player = createFighter(false, 0);
+            enemies = [];
+            for (let i = 0; i < game.rivalCount; i++) {
+                enemies.push(createFighter(true, i));
+            }
+            game.enemyLives = getTotalRivalLives();
+            overlay.classList.add('hidden');
+            startRound();
+        }
+
+        function startRound() {
+            resetFighterPositions();
+            game.sequence = [];
+            game.sequenceActors = [];
+            const aliveRivals = enemies.filter(e => e.lives > 0);
+            const seqLen = Math.min(INITIAL_SEQUENCE_LENGTH + Math.floor((game.round - 1) / 2), 7);
+            for (let i = 0; i < seqLen; i++) {
+                game.sequence.push(MOVES[Math.floor(Math.random() * MOVES.length)]);
+                const actor = aliveRivals[i % aliveRivals.length];
+                game.sequenceActors.push(actor);
+            }
+
+            game.state = 'ENEMY_DEMO';
+            game.demoIndex = 0;
+            game.demoTimer = 0.65; // Brief pause before rival starts moving
+            game.playerStep = 0;
+            game.bannerText = game.rivalCount === 2
+                ? `ROUND ${game.round} — WATCH BOTH RIVALS!`
+                : `ROUND ${game.round} — WATCH RIVAL!`;
+            game.bannerColor = COLORS.crimson;
+        }
+
+        function beginPlayerTurn() {
+            resetFighterPositions();
+            game.state = 'PLAYER_TURN';
+            game.playerStep = 0;
+            game.maxTurnTime = Math.max(2.2, BASE_MIMIC_TIME_LIMIT - (game.round - 1) * 0.15 + game.sequence.length * 0.25);
+            game.turnTimer = game.maxTurnTime;
+            game.bannerText = 'YOUR TURN! MIMIC NOW!';
+            game.bannerColor = COLORS.gold;
+        }
+
+        function resolveRound(playerWon, reasonText) {
+            game.state = 'ROUND_RESULT';
+            game.resultTimer = 1.45;
+
+            const centerX = width / 2;
+            const targetRival = getActiveTargetRival();
+            const rivalX = getRivalAnchorX(targetRival);
+
+            if (playerWon) {
+                targetRival.lives = Math.max(0, targetRival.lives - 1);
+                game.enemyLives = getTotalRivalLives();
+                const rivalLabel = game.rivalCount === 2 ? `RIVAL ${targetRival.rivalSlot + 1}` : 'RIVAL';
+                game.bannerText = `PERFECT MIMIC! ${rivalLabel} -1 LIFE`;
+                game.bannerColor = COLORS.gold;
+                targetRival.flashTimer = 0.6;
+                AudioFX.roundWin();
+                triggerShake(0.28, 8);
+                spawnBeam(false, COLORS.gold, targetRival);
+                spawnParticles(rivalX, height * 0.28, COLORS.gold, 26);
+                spawnParticles(rivalX, height * 0.28, COLORS.pink, 14);
+            } else {
+                game.playerLives = Math.max(0, game.playerLives - 1);
+                game.bannerText = reasonText || 'TOO SLOW! YOU -1 LIFE';
+                game.bannerColor = COLORS.crimson;
+                player.flashTimer = 0.6;
+                AudioFX.hitFail();
+                triggerShake(0.32, 10);
+                spawnBeam(true, COLORS.crimson, targetRival);
+                spawnParticles(centerX + player.xOffset, height * 0.74, COLORS.crimson, 26);
+            }
+        }
+
+        function showGameOver(victory) {
+            isPaused = false;
+            pauseOverlay.style.display = 'none';
+            pauseBtn.disabled = true;
+            game.state = 'GAME_OVER';
+            overlay.classList.remove('hidden');
+            const enemyNoun = game.rivalCount === 2 ? 'BOTH RIVALS' : 'CRIMSON RIVAL';
+            if (victory) {
+                overlayTitle.textContent = 'ARENA CHAMPION!';
+                overlayTitle.style.color = COLORS.gold;
+                overlayDesc.innerHTML = `You mimicked every move and defeated <span class="highlight-red">${enemyNoun}</span> in <span class="highlight-gold">${game.round} Rounds</span>!`;
+                actionBtn.textContent = 'PLAY AGAIN';
+            } else {
+                overlayTitle.textContent = 'ELIMINATED!';
+                overlayTitle.style.color = COLORS.crimson;
+                overlayDesc.innerHTML = `You ran out of lives on <span class="highlight-gold">Round ${game.round}</span> against <span class="highlight-red">${enemyNoun}</span>. Stay sharp and match every move on time!`;
+                actionBtn.textContent = 'TRY AGAIN';
+            }
+        }
+
+        function handlePlayerInput(move) {
+            if (isPaused || game.state !== 'PLAYER_TURN') return;
+
+            // Block movement if Player is currently frozen!
+            if (player.frozenTimer > 0) {
+                AudioFX.playTone(150, 'sine', 0.1, 0.15);
+                triggerShake(0.12, 4);
+                return;
+            }
+
+            // Visual button highlight
+            const btn = document.querySelector(`.ctrl-btn[data-move="${move}"]`);
+            if (btn) {
+                btn.classList.add('active');
+                setTimeout(() => btn.classList.remove('active'), 130);
+            }
+
+            performFighterMove(player, move);
+
+            const expectedMove = game.sequence[game.playerStep];
+            if (move === expectedMove) {
+                AudioFX.playerStep(game.playerStep);
+                spawnParticles(width / 2 + player.xOffset, height * 0.74, COLORS.pink, 8);
+                game.playerStep++;
+
+                if (game.playerStep >= game.sequence.length) {
+                    resolveRound(true);
+                }
+            } else {
+                resolveRound(false, `WRONG MOVE! EXPECTED ${expectedMove}`);
+            }
+        }
+
+        function activatePower(caster, target, powerType) {
+            if (isPaused || (game.state !== 'ENEMY_DEMO' && game.state !== 'PLAYER_TURN')) return;
+
+            const centerX = width / 2;
+            const targetX = target.isEnemy ? getRivalAnchorX(target) : centerX + target.xOffset;
+            const targetY = target.isEnemy ? height * 0.28 : height * 0.74;
+
+            if (powerType === 'FIRE') {
+                if (caster.fireCooldown > 0) return;
+                caster.fireCooldown = POWER_COOLDOWN_SECONDS;
+
+                AudioFX.fireBlast();
+                triggerShake(0.35, 11);
+                target.flashTimer = 0.55;
+                spawnBeam(caster.isEnemy, COLORS.crimson, target.isEnemy ? target : caster);
+                spawnParticles(targetX, targetY, COLORS.crimson, 28);
+                spawnParticles(targetX, targetY, COLORS.gold, 18);
+
+                if (target.isEnemy) {
+                    target.lives = Math.max(0, target.lives - FIRE_POWER_DAMAGE);
+                    game.enemyLives = getTotalRivalLives();
+                    const rivalLabel = game.rivalCount === 2 ? `RIVAL ${target.rivalSlot + 1}` : 'RIVAL';
+                    game.bannerText = `🔥 FIRE BLAST! ${rivalLabel} LOST 1/2 LIFE!`;
+                    game.bannerColor = COLORS.gold;
+                    if (game.enemyLives <= 0) {
+                        showGameOver(true);
+                    }
+                } else {
+                    game.playerLives = Math.max(0, game.playerLives - FIRE_POWER_DAMAGE);
+                    const rivalLabel = game.rivalCount === 2 ? `RIVAL ${caster.rivalSlot + 1}` : 'RIVAL';
+                    game.bannerText = `🔥 ${rivalLabel} FIRE BLAST! YOU LOST 1/2 LIFE!`;
+                    game.bannerColor = COLORS.crimson;
+                    if (game.playerLives <= 0) {
+                        showGameOver(false);
+                    }
+                }
+            } else if (powerType === 'FREEZE') {
+                if (caster.freezeCooldown > 0) return;
+                caster.freezeCooldown = POWER_COOLDOWN_SECONDS;
+
+                AudioFX.freezeCast();
+                triggerShake(0.25, 7);
+
+                if (target.isEnemy) {
+                    // Freeze all active rivals in the arena for 3 seconds!
+                    enemies.forEach((r) => {
+                        if (r.lives > 0) {
+                            r.frozenTimer = FREEZE_POWER_DURATION;
+                            const rx = getRivalAnchorX(r);
+                            spawnBeam(false, COLORS.ice, r);
+                            spawnParticles(rx, height * 0.28, COLORS.ice, 24);
+                            spawnParticles(rx, height * 0.28, COLORS.white, 14);
+                        }
+                    });
+                    game.bannerText = game.rivalCount === 2
+                        ? '❄️ BOTH RIVALS FROZEN FOR 3 SECONDS!'
+                        : '❄️ RIVAL FROZEN FOR 3 SECONDS!';
+                    game.bannerColor = COLORS.ice;
+                    if (game.state === 'PLAYER_TURN') {
+                        game.turnTimer = Math.min(game.maxTurnTime, game.turnTimer + FREEZE_POWER_DURATION);
+                    }
+                } else {
+                    target.frozenTimer = FREEZE_POWER_DURATION;
+                    spawnBeam(true, COLORS.ice, caster);
+                    spawnParticles(targetX, targetY, COLORS.ice, 32);
+                    spawnParticles(targetX, targetY, COLORS.white, 16);
+                    game.bannerText = '❄️ YOU ARE FROZEN FOR 3 SECONDS!';
+                    game.bannerColor = COLORS.ice;
+                }
+            }
+        }
+
+        /* ==========================================================================
+           6. KEYBOARD & TOUCH INPUT LISTENERS (ARROWS + WASD + POWERS B & K)
+           ========================================================================== */
+        window.addEventListener('keydown', (e) => {
+            if (e.repeat) return;
+            const key = e.key.toLowerCase();
+
+            if (key === 'p' || key === 'escape') {
+                if (game.state !== 'TITLE' && game.state !== 'GAME_OVER') {
+                    e.preventDefault();
+                    togglePause();
+                }
+                return;
+            }
+
+            if (isPaused) return;
+
+            if (game.state === 'TITLE' || game.state === 'GAME_OVER') {
+                if (key === 'enter' || key === ' ') {
+                    e.preventDefault();
+                    startNewGame();
+                }
+                return;
+            }
+
+            if (['arrowleft', 'arrowright', 'arrowup', 'arrowdown', ' '].includes(key)) {
+                e.preventDefault();
+            }
+
+            if (key === 'arrowleft' || key === 'a') handlePlayerInput('LEFT');
+            else if (key === 'arrowright' || key === 'd') handlePlayerInput('RIGHT');
+            else if (key === 'arrowup' || key === 'w') handlePlayerInput('UP');
+            else if (key === 'arrowdown' || key === 's') handlePlayerInput('DOWN');
+            else if (key === 'b') activatePower(player, getActiveTargetRival(), 'FIRE');
+            else if (key === 'k') activatePower(player, getActiveTargetRival(), 'FREEZE');
+        });
+
+        controlBtns.forEach((btn) => {
+            const triggerMove = (e) => {
+                e.preventDefault();
+                AudioFX.init();
+                const move = btn.getAttribute('data-move');
+                handlePlayerInput(move);
+            };
+            btn.addEventListener('mousedown', triggerMove);
+            btn.addEventListener('touchstart', triggerMove, { passive: false });
+        });
+
+        btnFire.addEventListener('click', (e) => {
+            e.preventDefault();
+            AudioFX.init();
+            activatePower(player, getActiveTargetRival(), 'FIRE');
+        });
+
+        btnFreeze.addEventListener('click', (e) => {
+            e.preventDefault();
+            AudioFX.init();
+            activatePower(player, getActiveTargetRival(), 'FREEZE');
+        });
+
+        actionBtn.addEventListener('click', startNewGame);
+
+        /* ==========================================================================
+           7. UPDATE SIMULATION LOOP
+           ========================================================================== */
+        function updateFighter(fighter, dt) {
+            if (fighter.fireCooldown > 0) fighter.fireCooldown = Math.max(0, fighter.fireCooldown - dt);
+            if (fighter.freezeCooldown > 0) fighter.freezeCooldown = Math.max(0, fighter.freezeCooldown - dt);
+
+            if (fighter.frozenTimer > 0) {
+                fighter.frozenTimer = Math.max(0, fighter.frozenTimer - dt);
+                return; // Skip movement/gravity updates while encased in ice
+            }
+
+            const laneSpacing = fighter.isEnemy && enemies.length > 1
+                ? Math.min(width * 0.11, 80)
+                : Math.min(width * 0.24, 180);
+            const targetX = fighter.laneOffset * laneSpacing;
+
+            // Horizontal movement toward target lane
+            const dx = targetX - fighter.xOffset;
+            if (Math.abs(dx) > 1) {
+                const step = Math.sign(dx) * Math.min(Math.abs(dx), PLAYER_MOVE_SPEED * dt * 1.4);
+                fighter.xOffset += step;
+            } else {
+                fighter.xOffset = targetX;
+            }
+
+            // Vertical Jump & Gravity Physics
+            if (fighter.yJump < 0 || fighter.vy !== 0) {
+                fighter.yJump += fighter.vy * dt;
+                fighter.vy += GRAVITY_FORCE * dt;
+                if (fighter.yJump >= 0) {
+                    fighter.yJump = 0;
+                    fighter.vy = 0;
+                    fighter.squish = 0.82; // Landing impact squash
+                }
+            }
+
+            // Duck & Squish Recovery
+            if (fighter.duckTimer > 0) {
+                fighter.duckTimer -= dt;
+                if (fighter.duckTimer <= 0) fighter.squish = 1;
+            } else {
+                fighter.squish += (1 - fighter.squish) * Math.min(1, dt * 14);
+            }
+
+            if (fighter.flashTimer > 0) fighter.flashTimer -= dt;
+            if (fighter.moveBadgeTimer > 0) fighter.moveBadgeTimer -= dt;
+        }
+
+        function update(dt) {
+            if (game.shakeTime > 0) game.shakeTime -= dt;
+
+            enemies.forEach(r => updateFighter(r, dt));
+            updateFighter(player, dt);
+
+            // Update Power Button Cooldown Labels
+            if (player.fireCooldown > 0) {
+                btnFire.disabled = true;
+                hintFire.textContent = `[B] ${Math.ceil(player.fireCooldown)}s`;
+            } else {
+                btnFire.disabled = false;
+                hintFire.textContent = '[B] READY';
+            }
+
+            if (player.freezeCooldown > 0) {
+                btnFreeze.disabled = true;
+                hintFreeze.textContent = `[K] ${Math.ceil(player.freezeCooldown)}s`;
+            } else {
+                btnFreeze.disabled = false;
+                hintFreeze.textContent = '[K] READY';
+            }
+
+            // Rival AI occasional power usage (respects 60s cooldown)
+            const activeRival = getActiveTargetRival();
+            if (game.state === 'PLAYER_TURN' && activeRival && activeRival.frozenTimer <= 0) {
+                game.enemyPowerTimer -= dt;
+                if (game.enemyPowerTimer <= 0) {
+                    game.enemyPowerTimer = 14 + Math.random() * 8;
+                    if (activeRival.fireCooldown <= 0 && game.playerLives > 0.5) {
+                        activatePower(activeRival, player, 'FIRE');
+                    } else if (activeRival.freezeCooldown <= 0) {
+                        activatePower(activeRival, player, 'FREEZE');
+                    }
+                }
+            }
+
+            // Update particles
+            for (let i = game.particles.length - 1; i >= 0; i--) {
+                const p = game.particles[i];
+                p.x += p.vx * dt;
+                p.y += p.vy * dt;
+                p.life -= dt;
+                if (p.life <= 0) game.particles.splice(i, 1);
+            }
+
+            // Update energy beams
+            for (let i = game.lasers.length - 1; i >= 0; i--) {
+                game.lasers[i].life -= dt;
+                if (game.lasers[i].life <= 0) game.lasers.splice(i, 1);
+            }
+
+            // State Machine
+            if (game.state === 'ENEMY_DEMO') {
+                if (enemies.some(r => r.lives > 0 && r.frozenTimer > 0)) return;
+
+                game.demoTimer -= dt;
+                if (game.demoTimer <= 0) {
+                    if (game.demoIndex < game.sequence.length) {
+                        const move = game.sequence[game.demoIndex];
+                        const actor = game.sequenceActors[game.demoIndex] || getActiveTargetRival();
+                        performFighterMove(actor, move);
+                        AudioFX.enemyMove(move);
+                        spawnParticles(getRivalAnchorX(actor), height * 0.28, actor.rivalSlot === 1 ? COLORS.pink : COLORS.crimson, 8);
+                        game.demoIndex++;
+                        const speedMultiplier = Math.max(0.65, 1 - (game.round - 1) * 0.04);
+                        game.demoTimer = ENEMY_MOVE_INTERVAL * speedMultiplier;
+                    } else {
+                        beginPlayerTurn();
+                    }
+                }
+            } else if (game.state === 'PLAYER_TURN') {
+                game.turnTimer -= dt;
+                if (game.turnTimer <= 0) {
+                    game.turnTimer = 0;
+                    resolveRound(false, 'TIME UP! YOU LOST 1 LIFE');
+                }
+            } else if (game.state === 'ROUND_RESULT') {
+                game.resultTimer -= dt;
+                if (game.resultTimer <= 0) {
+                    if (game.enemyLives <= 0) {
+                        showGameOver(true);
+                    } else if (game.playerLives <= 0) {
+                        showGameOver(false);
+                    } else {
+                        game.round++;
+                        startRound();
+                    }
+                }
+            }
+        }
+
+        /* ==========================================================================
+           8. CANVAS RENDERING (PURE GEOMETRIC SHAPES, ZERO EXTERNAL IMAGES)
+           ========================================================================== */
+        function drawArrowIcon(cx, cy, dir, size, color) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            const angles = { UP: 0, RIGHT: Math.PI / 2, DOWN: Math.PI, LEFT: -Math.PI / 2 };
+            ctx.rotate(angles[dir] || 0);
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.moveTo(0, -size * 0.55);
+            ctx.lineTo(size * 0.5, size * 0.1);
+            ctx.lineTo(size * 0.2, size * 0.1);
+            ctx.lineTo(size * 0.2, size * 0.55);
+            ctx.lineTo(-size * 0.2, size * 0.55);
+            ctx.lineTo(-size * 0.2, size * 0.1);
+            ctx.lineTo(-size * 0.5, size * 0.1);
+            ctx.closePath();
+            ctx.fill();
+            ctx.restore();
+        }
+
+        function drawArenaFloor() {
+            ctx.fillStyle = COLORS.bg;
+            ctx.fillRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            // Roblox Classic Studio Baseplate Stud Grid
+            const studSpacing = 36;
+            for (let sx = studSpacing; sx < width - 20; sx += studSpacing) {
+                for (let sy = studSpacing; sy < height - 20; sy += studSpacing) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+                    ctx.beginPath();
+                    ctx.arc(sx, sy, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+
+            // Blox Arena Outer Neon Kill-Brick Border
+            const pad = 26;
+            ctx.strokeStyle = COLORS.crimson;
+            ctx.lineWidth = 4;
+            ctx.strokeRect(pad, pad, width - pad * 2, height - pad * 2);
+
+            // Center Court Line & Spawn Pad
+            ctx.beginPath();
+            ctx.moveTo(pad, centerY);
+            ctx.lineTo(width - pad, centerY);
+            ctx.strokeStyle = 'rgba(255, 0, 211, 0.35)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, Math.min(width, height) * 0.14, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(244, 188, 34, 0.35)';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // 3 Lane Position Spawn Pads for Enemy (Top) & Player (Bottom)
+            const playerLaneSpacing = Math.min(width * 0.24, 180);
+            [-1, 0, 1].forEach((lane) => {
+                const plx = centerX + lane * playerLaneSpacing;
+                ctx.fillStyle = 'rgba(244, 188, 34, 0.16)';
+                ctx.strokeStyle = 'rgba(244, 188, 34, 0.45)';
+                ctx.lineWidth = 1.5;
+                ctx.fillRect(plx - 28, height * 0.76 - 10, 56, 20);
+                ctx.strokeRect(plx - 28, height * 0.76 - 10, 56, 20);
+            });
+
+            if (enemies.length === 1) {
+                [-1, 0, 1].forEach((lane) => {
+                    const elx = centerX + lane * playerLaneSpacing;
+                    ctx.fillStyle = 'rgba(224, 31, 39, 0.16)';
+                    ctx.strokeStyle = 'rgba(224, 31, 39, 0.45)';
+                    ctx.lineWidth = 1.5;
+                    ctx.fillRect(elx - 28, height * 0.30 - 10, 56, 20);
+                    ctx.strokeRect(elx - 28, height * 0.30 - 10, 56, 20);
+                });
+            } else {
+                const splitOffset = Math.min(width * 0.21, 175);
+                const subSpacing = Math.min(width * 0.11, 80);
+                [-1, 1].forEach((side, idx) => {
+                    const anchor = centerX + side * splitOffset;
+                    [-1, 0, 1].forEach((lane) => {
+                        ctx.fillStyle = idx === 0 ? 'rgba(224, 31, 39, 0.18)' : 'rgba(255, 0, 211, 0.18)';
+                        ctx.fillRect(anchor + lane * subSpacing - 20, height * 0.30 - 8, 40, 16);
+                    });
+                });
+            }
+        }
+
+        function drawFighter(fighter) {
+            if (fighter.isEnemy && fighter.lives <= 0) return; // Defeated rival OOFs out of the arena
+
+            const centerX = width / 2;
+            const baseY = fighter.isEnemy ? height * 0.28 : height * 0.74;
+            const x = fighter.isEnemy ? getRivalAnchorX(fighter) : centerX + fighter.xOffset;
+            const y = baseY + fighter.yJump * 0.32;
+            const scaleFactor = fighter.isEnemy && enemies.length > 1 ? 0.86 : 1;
+            const baseSize = Math.min(width, height) * 0.068 * scaleFactor;
+
+            // Ground Shadow (shrinks slightly when jumping)
+            const shadowScale = Math.max(0.55, 1 + fighter.yJump / 400);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.65)';
+            ctx.beginPath();
+            ctx.ellipse(x, baseY + baseSize * 0.88, baseSize * 0.9 * shadowScale, baseSize * 0.28 * shadowScale, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.save();
+            ctx.translate(x, y);
+            const scaleX = 2 - fighter.squish;
+            const scaleY = fighter.squish;
+            ctx.scale(scaleX, scaleY);
+
+            const isFlashing = fighter.flashTimer > 0 && Math.floor(fighter.flashTimer * 20) % 2 === 0;
+            const rivalMainColor = fighter.rivalSlot === 1 ? COLORS.pink : COLORS.crimson;
+            const torsoColor = isFlashing ? COLORS.white : (fighter.isEnemy ? rivalMainColor : COLORS.gold);
+            const limbColor = isFlashing ? COLORS.white : (fighter.isEnemy ? '#1f1618' : COLORS.crimson);
+            const headColor = isFlashing ? COLORS.white : (fighter.isEnemy ? (fighter.rivalSlot === 1 ? COLORS.gold : COLORS.pink) : COLORS.gold);
+
+            // ROBLOX R6 BLOCKY AVATAR (Legs, Arms, Torso, Head + Stud)
+            ctx.lineWidth = 2.5;
+            ctx.strokeStyle = COLORS.bg;
+
+            // Left & Right Blocky Legs
+            ctx.fillStyle = limbColor;
+            ctx.fillRect(-baseSize * 0.46, baseSize * 0.32, baseSize * 0.42, baseSize * 0.55);
+            ctx.strokeRect(-baseSize * 0.46, baseSize * 0.32, baseSize * 0.42, baseSize * 0.55);
+            ctx.fillRect(baseSize * 0.04, baseSize * 0.32, baseSize * 0.42, baseSize * 0.55);
+            ctx.strokeRect(baseSize * 0.04, baseSize * 0.32, baseSize * 0.42, baseSize * 0.55);
+
+            // Left & Right Blocky Arms
+            ctx.fillStyle = headColor;
+            ctx.fillRect(-baseSize * 0.86, -baseSize * 0.32, baseSize * 0.36, baseSize * 0.64);
+            ctx.strokeRect(-baseSize * 0.86, -baseSize * 0.32, baseSize * 0.36, baseSize * 0.64);
+            ctx.fillRect(baseSize * 0.50, -baseSize * 0.32, baseSize * 0.36, baseSize * 0.64);
+            ctx.strokeRect(baseSize * 0.50, -baseSize * 0.32, baseSize * 0.36, baseSize * 0.64);
+
+            // Blocky Torso
+            ctx.fillStyle = torsoColor;
+            ctx.fillRect(-baseSize * 0.48, -baseSize * 0.34, baseSize * 0.96, baseSize * 0.68);
+            ctx.strokeRect(-baseSize * 0.48, -baseSize * 0.34, baseSize * 0.96, baseSize * 0.68);
+
+            // Classic Roblox Chest Emblem (Tilted Square Blox Logo)
+            ctx.save();
+            ctx.rotate(Math.PI / 12);
+            ctx.fillStyle = fighter.isEnemy ? COLORS.white : COLORS.pink;
+            ctx.fillRect(-baseSize * 0.16, -baseSize * 0.16, baseSize * 0.32, baseSize * 0.32);
+            ctx.fillStyle = COLORS.bg;
+            ctx.fillRect(-baseSize * 0.06, -baseSize * 0.06, baseSize * 0.12, baseSize * 0.12);
+            ctx.restore();
+
+            // Blocky Roblox Head with Top Stud
+            ctx.fillStyle = headColor;
+            ctx.beginPath();
+            ctx.roundRect(-baseSize * 0.36, -baseSize * 0.94, baseSize * 0.72, baseSize * 0.58, 6);
+            ctx.fill();
+            ctx.stroke();
+
+            // Top Lego/Roblox Head Stud
+            ctx.fillRect(-baseSize * 0.16, -baseSize * 1.06, baseSize * 0.32, baseSize * 0.12);
+            ctx.strokeRect(-baseSize * 0.16, -baseSize * 1.06, baseSize * 0.32, baseSize * 0.12);
+
+            // Classic Roblox Face (Eyes + Smile / Angry Brow)
+            ctx.fillStyle = COLORS.bg;
+            ctx.beginPath();
+            ctx.arc(-baseSize * 0.14, -baseSize * 0.70, baseSize * 0.06, 0, Math.PI * 2);
+            ctx.arc(baseSize * 0.14, -baseSize * 0.70, baseSize * 0.06, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = COLORS.bg;
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            if (fighter.isEnemy) {
+                // Rival smirk
+                ctx.moveTo(-baseSize * 0.14, -baseSize * 0.52);
+                ctx.lineTo(baseSize * 0.14, -baseSize * 0.58);
+            } else {
+                // Classic Roblox smile!
+                ctx.arc(0, -baseSize * 0.62, baseSize * 0.14, 0.2, Math.PI - 0.2);
+            }
+            ctx.stroke();
+
+            ctx.restore();
+
+            // Draw Ice Block Overlay if Frozen!
+            if (fighter.frozenTimer > 0) {
+                ctx.save();
+                ctx.translate(x, y);
+                ctx.fillStyle = 'rgba(56, 189, 248, 0.45)';
+                ctx.strokeStyle = COLORS.white;
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.roundRect(-baseSize * 1.05, -baseSize * 1.15, baseSize * 2.1, baseSize * 2.1, 10);
+                ctx.fill();
+                ctx.stroke();
+
+                ctx.fillStyle = COLORS.white;
+                ctx.font = 'bold 13px "Russo One", sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`FROZEN ${fighter.frozenTimer.toFixed(1)}s`, 0, -baseSize * 1.32);
+                ctx.restore();
+                return;
+            }
+
+            // Floating Roblox Overhead Nametag & Action Badge
+            ctx.save();
+            ctx.font = 'bold 12px "Russo One", sans-serif';
+            ctx.textAlign = 'center';
+            const tagY = y - baseSize * 1.22;
+            ctx.fillStyle = fighter.isEnemy ? (fighter.rivalSlot === 1 ? COLORS.pink : COLORS.crimson) : COLORS.gold;
+            const label = fighter.moveBadgeTimer > 0 && fighter.activeMove
+                ? fighter.activeMove
+                : (fighter.isEnemy ? `RIVAL ${fighter.rivalSlot + 1}` : 'YOU [BLOX]');
+            ctx.fillText(label, x, tagY);
+            ctx.restore();
+        }
+
+        function drawEffects() {
+            const centerX = width / 2;
+
+            // Energy Beams (Attack / Power Hits)
+            for (const beam of game.lasers) {
+                const alpha = Math.max(0, beam.life / beam.maxLife);
+                const rivalX = getRivalAnchorX(beam.rivalRef);
+                const startX = beam.fromEnemy ? rivalX : centerX + player.xOffset;
+                const startY = beam.fromEnemy ? height * 0.28 : height * 0.74;
+                const endX = beam.fromEnemy ? centerX + player.xOffset : rivalX;
+                const endY = beam.fromEnemy ? height * 0.74 : height * 0.28;
+
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.strokeStyle = beam.color;
+                ctx.lineWidth = 10 * alpha + 3;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+
+                ctx.strokeStyle = COLORS.white;
+                ctx.lineWidth = 4 * alpha;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+                ctx.lineTo(endX, endY);
+                ctx.stroke();
+                ctx.restore();
+            }
+
+            // Sparks & Explosion Particles
+            for (const p of game.particles) {
+                const alpha = Math.max(0, p.life / p.maxLife);
+                ctx.save();
+                ctx.globalAlpha = alpha;
+                ctx.fillStyle = p.color;
+                ctx.fillRect(p.x - p.size / 2, p.y - p.size / 2, p.size, p.size);
+                ctx.restore();
+            }
+        }
+
+        function drawLifePips(x, y, currentLives, maxLives, fillColor, alignRight = false) {
+            const pipW = 24;
+            const pipH = 14;
+            const gap = 6;
+            const totalW = maxLives * pipW + (maxLives - 1) * gap;
+            const startX = alignRight ? x - totalW : x;
+
+            for (let i = 0; i < maxLives; i++) {
+                const px = startX + i * (pipW + gap);
+                ctx.fillStyle = '#1f1618';
+                ctx.strokeStyle = COLORS.white;
+                ctx.lineWidth = 1.8;
+                ctx.beginPath();
+                ctx.roundRect(px, y, pipW, pipH, 4);
+                ctx.fill();
+                ctx.stroke();
+
+                const pipLife = Math.max(0, Math.min(1, currentLives - i));
+                if (pipLife > 0) {
+                    ctx.fillStyle = fillColor;
+                    ctx.beginPath();
+                    ctx.roundRect(px + 2, y + 2, (pipW - 4) * pipLife, pipH - 4, 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        function drawHUD() {
+            const pad = 38;
+            ctx.save();
+
+            // Player Lives (Top-Left)
+            ctx.font = 'bold 13px "Russo One", sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillStyle = COLORS.gold;
+            ctx.fillText(`YOU (${game.playerLives.toFixed(1)} HP)`, pad, 52);
+            drawLifePips(pad, 58, game.playerLives, STARTING_LIVES, COLORS.gold, false);
+
+            // Rival Lives (Top-Right)
+            ctx.textAlign = 'right';
+            if (enemies.length === 1) {
+                ctx.fillStyle = COLORS.crimson;
+                ctx.fillText(`RIVAL (${enemies[0].lives.toFixed(1)} HP)`, width - pad, 52);
+                drawLifePips(width - pad, 58, enemies[0].lives, STARTING_LIVES, COLORS.crimson, true);
+            } else {
+                ctx.fillStyle = COLORS.crimson;
+                ctx.fillText(`R1 (${enemies[0].lives.toFixed(1)})`, width - pad, 48);
+                drawLifePips(width - pad, 53, enemies[0].lives, STARTING_LIVES, COLORS.crimson, true);
+
+                ctx.fillStyle = COLORS.pink;
+                ctx.fillText(`R2 (${enemies[1].lives.toFixed(1)})`, width - pad, 84);
+                drawLifePips(width - pad, 89, enemies[1].lives, STARTING_LIVES, COLORS.pink, true);
+            }
+
+            // Round Indicator & Status Banner (Center-Top)
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 14px "Russo One", sans-serif';
+            ctx.fillStyle = COLORS.white;
+            ctx.fillText(`STAGE ${game.round}`, width / 2, 50);
+
+            ctx.font = 'bold 16px "Russo One", sans-serif';
+            ctx.fillStyle = game.bannerColor;
+            ctx.fillText(game.bannerText, width / 2, height * 0.46);
+
+            // Move Sequence Progress Chips & Mimic Countdown Bar
+            if (game.sequence.length > 0 && (game.state === 'ENEMY_DEMO' || game.state === 'PLAYER_TURN')) {
+                const chipSize = 30;
+                const chipGap = 8;
+                const totalSeqW = game.sequence.length * chipSize + (game.sequence.length - 1) * chipGap;
+                const seqStartX = (width - totalSeqW) / 2;
+                const seqY = height * 0.50;
+
+                for (let i = 0; i < game.sequence.length; i++) {
+                    const cx = seqStartX + i * (chipSize + chipGap);
+                    const isDone = game.state === 'PLAYER_TURN' && i < game.playerStep;
+                    const isCurrentDemo = game.state === 'ENEMY_DEMO' && i === game.demoIndex - 1;
+                    const isNextInput = game.state === 'PLAYER_TURN' && i === game.playerStep;
+
+                    ctx.fillStyle = isDone ? COLORS.gold : (isCurrentDemo ? COLORS.crimson : '#1a1113');
+                    ctx.strokeStyle = isNextInput ? COLORS.pink : (isDone ? COLORS.white : COLORS.lightGrey);
+                    ctx.lineWidth = isNextInput || isCurrentDemo ? 2.5 : 1.5;
+                    ctx.beginPath();
+                    ctx.roundRect(cx, seqY, chipSize, chipSize, 6);
+                    ctx.fill();
+                    ctx.stroke();
+
+                    // Only reveal the arrow AFTER the player successfully mimics that step!
+                    if (isDone) {
+                        drawArrowIcon(cx + chipSize / 2, seqY + chipSize / 2, game.sequence[i], chipSize * 0.65, COLORS.bg);
+                    } else {
+                        ctx.fillStyle = isNextInput ? COLORS.pink : COLORS.lightGrey;
+                        ctx.font = 'bold 14px "Russo One", sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+                        ctx.fillText('?', cx + chipSize / 2, seqY + chipSize / 2 + 1);
+                    }
+                }
+            }
+
+            // Player Turn Timer Bar
+            if (game.state === 'PLAYER_TURN') {
+                const barW = Math.min(340, width * 0.52);
+                const barH = 10;
+                const barX = (width - barW) / 2;
+                const barY = height * 0.58;
+                const ratio = Math.max(0, game.turnTimer / game.maxTurnTime);
+
+                ctx.fillStyle = '#1f1618';
+                ctx.beginPath();
+                ctx.roundRect(barX, barY, barW, barH, 5);
+                ctx.fill();
+
+                ctx.fillStyle = ratio > 0.35 ? COLORS.gold : COLORS.crimson;
+                ctx.beginPath();
+                ctx.roundRect(barX, barY, barW * ratio, barH, 5);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        function render() {
+            ctx.save();
+            if (game.shakeTime > 0) {
+                const dx = (Math.random() - 0.5) * game.shakeMagnitude * 2;
+                const dy = (Math.random() - 0.5) * game.shakeMagnitude * 2;
+                ctx.translate(dx, dy);
+            }
+
+            drawArenaFloor();
+            enemies.forEach(r => drawFighter(r));
+            drawFighter(player);
+            drawEffects();
+            drawHUD();
+
+            ctx.restore();
+        }
+
+        /* ==========================================================================
+           9. MAIN ANIMATION LOOP (STARTED ON WINDOW LOAD)
+           ========================================================================== */
+        let lastTime = 0;
+
+        function gameLoop(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const dt = Math.min(0.05, (timestamp - lastTime) / 1000);
+            lastTime = timestamp;
+
+            if (!isPaused) {
+                update(dt);
+            }
+            render();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        window.onload = function () {
+            resizeCanvas();
+            requestAnimationFrame(gameLoop);
+        };
+    </script>
+</body>
+</html>
